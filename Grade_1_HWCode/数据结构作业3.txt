@@ -1,0 +1,318 @@
+编程题1
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class opstack {
+public:
+	int top;
+	char* data;
+	opstack();
+	~opstack();
+	bool empty();
+	bool push(char);
+	bool pop(char& );
+	bool gettop(char& );
+};
+
+opstack::opstack() {
+	top = -1;
+	data = new char[1000];
+};
+
+opstack::~opstack() {
+	delete[] data;
+}
+
+bool opstack::empty() {
+	return top == -1;
+}
+
+bool opstack::push(char e) {
+	if (top == 999)
+		return false;
+	else {
+		top++;
+		data[top] = e;
+		return true;
+	}
+}
+
+bool opstack::pop(char& e) {
+	if (empty()) {
+		return false;
+	}
+	else {
+		e = data[top];
+		top--;
+		return true;
+	}
+}
+
+bool opstack::gettop(char& e) {
+	if (empty())
+		return false;
+	else {
+		e = data[top];
+		return true;
+	}
+}
+
+class numstack {
+public:
+	int top;
+	int* data;
+	numstack();
+	~numstack();
+	bool empty();
+	bool push(int);
+	bool pop(int&);
+	bool gettop(int&);
+};
+
+numstack::numstack() {
+	top = -1;
+	data = new int[1000];
+};
+
+numstack::~numstack() {
+	delete[] data;
+}
+
+bool numstack::empty() {
+	return top == -1;
+}
+
+bool numstack::push(int e) {
+	if (top == 999)
+		return false;
+	else {
+		top++;
+		data[top] = e;
+		return true;
+	}
+}
+
+bool numstack::pop(int& e) {
+	if (empty()) {
+		return false;
+	}
+	else {
+		e = data[top];
+		top--;
+		return true;
+	}
+}
+
+bool numstack::gettop(int& e) {
+	if (empty())
+		return false;
+	else {
+		e = data[top];
+		return true;
+	}
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	numstack st;
+	char ch;
+	int a, b, c, d;
+	while (ifs >> ch) {
+		if (ch == '+') {
+			st.pop(a);
+			st.pop(b);
+			c = a + b;
+			st.push(c);
+		}
+		if (ch == '-') {
+			ifs >> ch;
+			if (ch >= '0' && ch <= '9') {
+				d = 0;
+				while (ch >= '0' && ch <= '9') {
+					d = d * 10 + (ch - '0');
+					ifs >> ch;
+				}
+				st.push(-d);
+			}
+			else {
+				st.pop(a);
+				st.pop(b);
+				c = b - a;
+				st.push(c);
+			}
+		}
+		if (ch == '*') {
+			st.pop(a);
+			st.pop(b);
+			c = a * b;
+			st.push(c);
+		}
+		if (ch == '/') {
+			st.pop(a);
+			st.pop(b);
+			c = b/a;
+			st.push(c);
+		}
+		if(ch >= '0' && ch <= '9') {
+			d = 0;
+			while (ch >= '0' && ch <= '9') {
+				d = d * 10 + (ch - '0');
+				ifs >> ch;
+			}
+			st.push(d);
+		}
+	}
+	int x;
+	st.gettop(x);
+	cout << x << endl;
+	return 0;
+}
+
+
+编程题2
+
+
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	char stack;
+	Node* next;
+	Node();
+	Node(int v,char t);
+	Node(int v);
+};
+
+Node::Node() {
+	next = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+}
+
+Node::Node(int v,char t) {
+	val = v;
+	stack = t;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void headinsert(int ,char );
+	int pop(char);
+	~list();
+	void change(char ,char );
+private:
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	count = 0;
+}
+
+list::~list() {
+	Node* p = head;
+	while (p != nullptr) {
+		Node* q = p->next;
+		delete p;
+		p = q;
+	}
+	//cout << "链表已经被析构" << endl;
+}
+
+void list::change(char c1,char c2) {
+	Node* p = head->next;
+	while (p != nullptr) {
+		if (p->stack == c2) {
+			p->stack = c1;
+		}
+		p = p->next;
+	}
+	//cout << "链表已经被析构" << endl;
+}
+
+int list::pop(char t) {
+	int e;
+	Node* p = head;
+	Node* q;
+	while (p->next != nullptr) {
+		if (p->next->stack == t) {
+			e = p->next->val;
+			q = p->next;
+			p->next = p->next->next;
+			delete q;
+			return e;
+		}
+		p = p->next;
+	}
+}
+
+void list::headinsert(int v, char t) {
+	Node* s = new Node(v, t);
+	Node* p = head->next;
+	if (count == 0) {
+		count++;
+		head->next = s;
+		return;
+	}
+	else {
+		count++;
+		s->next = p;
+		head->next = s;
+		return;
+	}
+}
+
+int main() {
+	int n;
+	ifstream ifs("in.txt");
+	list C;
+	ifs >> n;
+	string* txtLine=new string[n+1];
+	for (int i = 0; i < n+1; i++) {
+		getline(ifs, txtLine[i]);
+	}
+	ifs.close();
+	for (int i = 1; i <= n; i++) {
+		if (txtLine[i].find("push A")!=-1) {
+			txtLine[i].erase(0, 7);
+			int x;
+			x = stoi(txtLine[i]);
+			C.headinsert(x, 'A');
+		}
+		if (txtLine[i].find("push B") != -1) {
+			txtLine[i].erase(0, 7);
+			int x;
+			x = stoi(txtLine[i]);
+			C.headinsert(x, 'B');
+		}
+		if (txtLine[i].find("pop A") != -1) {
+			int e=C.pop('A');
+			cout << e << endl;
+		}
+		if (txtLine[i].find("pop B") != -1) {
+			int e=C.pop('B');
+			cout << e << endl;
+		}
+		if (txtLine[i].find("merge A B") != -1) {
+			C.change('A', 'B');
+		}
+		if (txtLine[i].find("merge B A") != -1) {
+			C.change('B','A');
+		}
+	}
+	return 0;
+}

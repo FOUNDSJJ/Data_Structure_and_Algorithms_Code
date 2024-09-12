@@ -1,0 +1,143 @@
+数据结构b作业1
+
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <queue>
+
+
+using namespace std;
+
+vector<int> vec;
+
+class BTNode {
+public:
+	int val;
+	BTNode* lchild;
+	BTNode* rchild;
+	BTNode() :val(-1), lchild(nullptr), rchild(nullptr) {};
+	BTNode(int v) :val(v), lchild(nullptr), rchild(nullptr) {};
+};
+
+queue<BTNode*> QBT;
+
+void CreateBTree(string& st, BTNode*& root) {
+	int i = 0, top = -1, k = -1;
+	BTNode* St[2000];
+	BTNode* p = nullptr;
+	root = nullptr;
+	char ch = st[i];
+	string temp = "";
+	while (ch != '\0') {
+	FLAG:
+		switch (ch) {
+		case '(':
+			top++;
+			St[top] = p;
+			k = 1;
+			break;
+		case ')':
+			top--;
+			break;
+		case ',':
+			k = 2;
+			break;
+		default:
+			while (ch <= '9' && ch >= '0') {
+				temp += ch;
+				i++;
+				ch = st[i];
+			}
+			int v = stoi(temp);
+			p = new BTNode(v);
+			temp = "";
+			if (root == nullptr) {
+				root = p;
+			}
+			else {
+				switch (k) {
+				case 1:
+					St[top]->lchild = p;
+					break;
+				case 2:
+					St[top]->rchild = p;
+					break;
+				}
+			}
+			goto FLAG;
+		}
+		i++;
+		ch = st[i];
+	}
+}
+
+void DispBTree(BTNode* root){
+	if (root == nullptr)
+		return;
+	else {
+		QBT.push(root);
+		BTNode* p = nullptr;
+		while (!QBT.empty()) {
+			p = QBT.front();
+			cout << p->val << " ";
+			QBT.pop();
+			if(p->rchild!=nullptr)
+				QBT.push(p->rchild);
+			if (p->lchild != nullptr)
+				QBT.push(p->lchild);
+		}
+	}
+	return;
+}
+
+void CollectBTreeLeaf(BTNode* root) {
+	if (root->lchild == nullptr && root->rchild == nullptr) {
+		vec.push_back(root->val);
+		return;
+	}
+	if (root->lchild != nullptr)
+		CollectBTreeLeaf(root->lchild);
+	if (root->rchild != nullptr)
+		CollectBTreeLeaf(root->rchild);
+	return;
+}
+
+void DisLeaf1() {
+	if (vec.empty())
+		return;
+	else {
+		for (vector<int>::iterator i = vec.begin(); i != vec.end(); i++)
+			cout << *i << " ";
+	}
+	return;
+}
+
+void DisLeaf2() {
+	if (vec.empty())
+		return;
+	else {
+		vector<int>::iterator i;
+		for (i = vec.end()-1; i != vec.begin(); i--)
+			cout << *i << " ";
+		cout << *i;
+	}
+	return;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	string st = "";
+	ifs >> st;
+	ifs.close();
+	BTNode* root=nullptr;
+	CreateBTree(st, root);
+	CollectBTreeLeaf(root);
+	DisLeaf1();
+	cout << endl;
+	DisLeaf2();
+	cout << endl;
+	DispBTree(root);
+	return 0;
+}

@@ -1,0 +1,92 @@
+数据结构b作业4
+
+
+T1
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int path[15], k = 0;
+
+bool HalfSeek(int Goal, int low, int high, int* arr) {
+	if (low > high)
+		return false;
+	int mid = (low + high) / 2;
+	path[k] = arr[mid];
+	k++;
+	if (arr[mid] == Goal) {
+		return true;
+	}
+	else {
+		if (arr[mid] > Goal)
+			return HalfSeek(Goal, low, mid - 1, arr);
+		else 
+			return HalfSeek(Goal,  mid + 1,high, arr);
+	}
+	return false;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	ofstream ofs("out.txt");
+	int Goal = 0;
+	ifs >> Goal;
+	int arr[20000];
+	int num = 0;
+	while (ifs >> arr[num])
+		num++;
+	ifs.close();
+	int high = num - 1;
+	if (HalfSeek(Goal, 0, high, arr))
+		ofs << "True" << endl;
+	else
+		ofs << "False" << endl;
+	for (int j = 0; j < k; j++)
+		ofs << path[j] << " ";
+	ofs.close();
+	k = 0;
+	return 0;
+}
+
+
+
+T2
+
+#include <iostream>
+#include <algorithm>
+#include <fstream>
+
+using namespace std;
+
+int arr[100000], num, Cnum;
+
+bool Test(int val) {
+	int cnt = 0;
+	for (int i = 0; i < num; i++) {
+		cnt += num - (lower_bound(arr, arr + num, arr[i] + val) - arr);
+	}
+	return cnt > Cnum;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	ifs >> num;
+	Cnum = num * (num - 1) / 4;
+	for (int i = 0; i < num; i++)
+		ifs >> arr[i];
+	ifs.close();
+	sort(arr, arr + num);
+	int l = 0, r = arr[num - 1] - arr[0];
+	while (r - l > 1) {
+		int mid = (l + r) / 2;
+		if (Test(mid))
+			l = mid;
+		else
+			r = mid;
+	}
+	cout << l;
+	return 0;
+}

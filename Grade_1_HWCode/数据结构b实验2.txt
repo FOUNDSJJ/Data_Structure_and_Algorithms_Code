@@ -1,0 +1,311 @@
+数据结构b实验2
+
+
+
+T1
+
+
+#include <iostream>
+#include <set>
+
+#define INT_MAX 10000
+
+using namespace std;
+
+set<int> GS;
+int Cost = 0;
+
+class GrahNode {
+public:
+	int id = -1;
+	int weight = INT_MAX;
+	GrahNode() {};
+	void ChangeNode(int i, int w) {
+		id = i;
+		weight = w;
+	}
+};
+
+class EdgeNode {
+public:
+	int id = -1;
+	int weight = INT_MAX;
+	EdgeNode() {};
+	EdgeNode(int i, int w) :id(i), weight(w) {};
+	void ChangeNode(int i, int w) {
+		id = i;
+		weight = w;
+	}
+};
+
+void Prim(GrahNode** GN, int num, int v) {
+	EdgeNode* LowCost = new EdgeNode[num];
+	int* ClosestNode = new int[num];
+	for (int i = 0; i < num; i++) {
+		LowCost[i].ChangeNode(GN[v][i].id, GN[v][i].weight);
+		ClosestNode[i] = v;
+	}
+	for (int i = 1; i < num; i++) {
+		int Min = INT_MAX;
+		int k = -1;
+		for (int m = 0; m < num; m++) {
+			if (LowCost[m].weight != 0 && LowCost[m].weight < Min) {
+				Min = LowCost[m].weight;
+				k = m;
+			}
+		}
+		GS.insert(LowCost[k].id);
+		Cost += LowCost[k].weight;
+		LowCost[k].ChangeNode(LowCost[k].id, 0);
+		for (int n = 0; n < num; n++) {
+			if (LowCost[n].weight != 0 && n != v && LowCost[n].weight > GN[k][n].weight) {
+				LowCost[n].ChangeNode(GN[k][n].id, GN[k][n].weight);
+				ClosestNode[n] = k;
+			}
+		}
+	}
+	delete[] LowCost;
+	delete[] ClosestNode;
+	return;
+}
+
+int main() {
+	int NodeNum = 0;
+	int RoadNum = 0;
+	cin >> NodeNum >> RoadNum;
+	GrahNode** GN = new GrahNode * [NodeNum];
+	for (int m = 0; m < NodeNum; m++)
+		GN[m] = new GrahNode[NodeNum];
+	for (int i = 0; i < RoadNum; i++) {
+		int id = -1, N1 = -1, N2 = -1, weight = -1;
+		cin >> id >> N1 >> N2 >> weight;
+		GN[N1][N2].ChangeNode(id, weight);
+		GN[N2][N1].ChangeNode(id, weight);
+	}
+	Prim(GN, NodeNum, 0);
+	for (set<int>::iterator it = GS.begin(); it != GS.end(); it++)
+		cout << *it << " ";
+	cout << endl << Cost;
+	for (int i = 0; i < NodeNum; i++) {
+		delete[] GN[i];
+	}
+	delete[] GN;
+	return 0;
+}
+
+
+
+
+T4
+
+
+
+#include <iostream>
+
+using namespace std;
+
+int k = 0;
+
+class BTNode {
+public:
+	int val = -1;
+	BTNode* left = nullptr;
+	BTNode* right = nullptr;
+	BTNode() {};
+	BTNode(int v) :val(v) {};
+	bool operator>(int v) {
+		if (val > v)
+			return true;
+		return false;
+	}
+	bool operator==(int v) {
+		if (val == v)
+			return true;
+		return false;
+	}
+};
+
+void CreatBST(BTNode*& root, int v) {
+	if (root == nullptr) {
+		root = new BTNode(v);
+		return;
+	}
+	else {
+		if (*root > v)
+			CreatBST(root->left, v);
+		else
+			CreatBST(root->right, v);
+	}
+	return;
+}
+
+void DeleteBST(BTNode* root) {
+	if (root == nullptr)
+		return;
+	DeleteBST(root->left);
+	DeleteBST(root->right);
+	delete root;
+	return;
+}
+
+int BSTCount = 0;
+
+void BSTSeek(BTNode* root, int Goal) {
+	BSTCount++;
+	if (root == nullptr)
+		return;
+	if (*root > Goal)
+		BSTSeek(root->left, Goal);
+	else
+		if (*root == Goal)
+			return;
+		else
+			BSTSeek(root->right, Goal);
+	return;
+}
+
+void InBTree(BTNode* root, int*& arr) {
+	if (root == nullptr)
+		return;
+	InBTree(root->left, arr);
+	arr[k] = root->val;
+	cout << root->val << " ";
+	k++;
+	InBTree(root->right, arr);
+	return;
+}
+
+int HalfCount = 0;
+
+bool HalfSeek(int Goal, int low, int high, int* arr) {
+	HalfCount++;
+	if (low > high)
+		return false;
+	int mid = (low + high) / 2;
+	if (arr[mid] == Goal) {
+		return true;
+	}
+	else {
+		if (arr[mid] > Goal)
+			return HalfSeek(Goal, low, mid - 1, arr);
+		else
+			return HalfSeek(Goal, mid + 1, high, arr);
+	}
+	return false;
+}
+
+int main() {
+	int num = 0;
+	cin >> num;
+	int v = 0;
+	BTNode* root = nullptr;
+	for (int i = 0; i < num; i++) {
+		cin >> v;
+		CreatBST(root, v);
+	}
+	int Goal = 0;
+	cin >> Goal;
+	BSTSeek(root, Goal);
+	cout << BSTCount << endl;
+	int* arr = new int[num];
+	InBTree(root, arr);
+	HalfSeek(Goal, 0, k - 1, arr);
+	cout << endl << HalfCount << endl;
+	DeleteBST(root);
+	delete[] arr;
+	return 0;
+}
+
+
+
+
+T6
+
+
+#include <iostream>
+
+#define A 0
+#define B 1
+#define C 2
+#define G 3
+#define T 4
+
+using namespace std;
+
+struct DNA {
+	string st = "";
+	int Len = 0;
+	int Inversion = 0;
+	DNA() {};
+	DNA(string s, int l, int i) :st(s), Len(l), Inversion(i) {};
+	void CaculateInversion();
+};
+
+void DNA::CaculateInversion() {
+	if (Len <= 0)
+		return;
+	int arr[5] = { 0 };
+	int i = 0;
+	while (i < Len) {
+		switch (st[i]) {
+		case 'A':
+			arr[A]++;
+			Inversion += arr[B] + arr[C] + arr[G] + arr[T];
+			break;
+		case 'B':
+			arr[B]++;
+			Inversion += arr[C] + arr[G] + arr[T];
+			break;
+		case 'C':
+			arr[C]++;
+			Inversion += arr[G] + arr[T];
+			break;
+		case 'G':
+			arr[G]++;
+			Inversion += arr[T];
+			break;
+		case 'T':
+			arr[T]++;
+			break;
+		}
+		i++;
+	}
+	return;
+}
+
+void Exchange(DNA& Min, DNA& Max) {
+	DNA p(Min.st, Min.Len, Min.Inversion);
+	Min.st = Max.st;
+	Min.Len = Max.Len;
+	Min.Inversion = Max.Inversion;
+	Max.st = p.st;
+	Max.Len = p.Len;
+	Max.Inversion = p.Inversion;
+	return;
+}
+
+void SortDNA(DNA* stDNA, int num) {
+	for (int i = 0; i < num - 1; i++)
+		for (int j = 0; j < num - i - 1; j++)
+			if (stDNA[j].Inversion > stDNA[j + 1].Inversion)
+				Exchange(stDNA[j], stDNA[j + 1]);
+	return;
+}
+
+int main() {
+	int Length = 0, num = 0;
+	cin >> Length >> num;
+	DNA* stDNA = new DNA[num];
+	string temp = "";
+	for (int i = 0; i < num; i++) {
+		cin >> temp;
+		stDNA[i].st = temp;
+		stDNA[i].Len = Length;
+		stDNA[i].CaculateInversion();
+	}
+	SortDNA(stDNA, num);
+	for (int i = 0; i < num; i++)
+		cout << stDNA[i].st << endl;
+	delete[] stDNA;
+	return 0;
+}

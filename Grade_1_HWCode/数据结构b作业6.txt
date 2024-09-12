@@ -1,0 +1,197 @@
+数据结构b作业6
+
+
+
+T1
+
+
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+void Merge(vector<int>& vec, int Start, int Mid, int End) {
+	int i = Start, j = Mid + 1, t = 0;
+	int* Temp=new int[End - Start + 1];
+	while (i <= Mid && j <= End) {
+		if (vec[i] <= vec[j]) {
+			Temp[t] = vec[i];
+			i++;
+			t++;
+		}
+		else {
+			Temp[t] = vec[j];
+			j++;
+			t++;
+		}
+	}
+	while (i <= Mid) {
+		Temp[t] = vec[i];
+		i++;
+		t++;
+	}
+	while (j <= End) {
+		Temp[t] = vec[j];
+		j++;
+		t++;
+	}
+	for (int m = 0; m < t; m++)
+		vec[Start + m] = Temp[m];
+	delete[] Temp;
+	return;
+}
+
+void MergePass(vector<int>& vec, int Len, int num) {
+	int i = 0;
+	for (; i + 2 * Len - 1 < num; i += 2 * Len)
+		Merge(vec, i, i + Len - 1, i + 2 * Len - 1);
+	if (i + Len < num)
+		Merge(vec, i, i + Len - 1, num - 1);
+	return;
+}
+
+void Display(vector<int> vec, int num) {
+	ofstream ofs("out.txt");
+	for (int i = 0; i < num; i++)
+		ofs << vec[i] << " ";
+	ofs.close();
+	return;
+}
+
+int main() {
+	fstream ifs("in.txt");
+	int num = 0, temp = 0;
+	vector<int> vec;
+	while (ifs >> temp) {
+		vec.push_back(temp);
+		num++;
+	}
+	ifs.close();
+	for (int Len = 1; Len < num; Len *= 2)
+		MergePass(vec, Len, num);
+	Display(vec, num);
+	return 0;
+}
+
+
+
+
+
+T2
+
+
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+void Exchange(vector<int>& vec, int i, int j) {
+	int temp = vec[i];
+	vec[i] = vec[j];
+	vec[j] = temp;
+	return;
+}
+
+void QuickSort(vector<int>& vec, int Start, int End) {
+	if (Start >= End)
+		return;
+	int i = Start;
+	int j = End;
+	int ReferValue = vec[i];
+	while (i < j) {
+		while (vec[j] > ReferValue && i < j)
+			j--;
+		while (vec[i] <= ReferValue && i < j)
+			i++;
+		if (i < j)
+			Exchange(vec, i, j);
+	}
+	Exchange(vec, j, Start);
+	QuickSort(vec, Start, i - 1);
+	QuickSort(vec, i + 1, End);
+	return;
+}
+
+void Display(vector<int> vec, int num) {
+	ofstream ofs("out.txt");
+	for (int i = 0; i < num; i++)
+		ofs << vec[i] << " ";
+	ofs.close();
+	return;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	vector<int> vec;
+	int num = 0;
+	int temp = 0;
+	while (ifs >> temp) {
+		vec.push_back(temp);
+		num++;
+	}
+	QuickSort(vec, 0, num - 1);
+	Display(vec, num);
+	ifs.close();
+	return 0;
+}
+
+
+
+
+T3
+
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+void Exchange(vector<int>& vec, int i, int j) {
+	int temp = vec[i];
+	vec[i] = vec[j];
+	vec[j] = temp;
+	return;
+}
+
+
+void SeekMax_m(vector<int>& vec, int num, int m) {
+	if (num == 0 || m == -1)
+		return;
+	for (int i = 0; i < m; i++) {
+		int Max = i;
+		for (int j = i + 1; j < num; j++) {
+			if (vec[j] > vec[Max])
+				Max = j;
+			if (j == num - 1)
+				Exchange(vec, Max, i);
+		}
+	}
+	return;
+}
+
+void Display(vector<int> vec, int num) {
+	for (int i = 0; i < num; i++)
+		cout << vec[i] << " ";
+	return;
+}
+
+int main() {
+	fstream ifs("in.txt");
+	int num = 0, temp = 0, m = -1;
+	vector<int> vec;
+	ifs >> num >> m;
+	while (ifs >> temp)
+		vec.push_back(temp);
+	ifs.close();
+	SeekMax_m(vec, num, m);
+	Display(vec, m);
+	return 0;
+}

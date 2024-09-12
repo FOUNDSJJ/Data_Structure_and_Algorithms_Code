@@ -1,0 +1,44 @@
+数据结构b作业3
+
+
+T1
+
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int num_of_town = 0, num_of_road = 0, * pre;
+
+int FindRoot(int x) {
+	if (pre[x] == x)
+		return x;
+	return FindRoot(pre[x]);
+}
+
+void Link(int town1, int town2) {
+	pre[FindRoot(town1)] = FindRoot(town2);
+	return;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	ifs >> num_of_town >> num_of_road;
+	pre = new int[num_of_town + 1];
+	for (int i = 1; i <= num_of_town; i++)
+		pre[i] = i;
+	int town1 = 0, town2 = 0;
+	for (int i = 0; i < num_of_road; i++) {
+		ifs >> town1 >> town2;
+		Link(town1, town2);
+	}
+	ifs.close();
+	int num = -1;
+	for (int i = 1; i <= num_of_town; i++)
+		if (pre[i] == i)
+			num++;
+	cout << num;
+	return 0;
+}

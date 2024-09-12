@@ -1,0 +1,70 @@
+串的模式匹配
+
+1、求next值
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+void GetNext(string t, int* next) {
+	int j = 0, k = -1;
+	next[0] = -1;
+	while (j < t.length() - 1) {
+		if (k == -1 || t[j] == t[k]) {
+			j++;
+			k++;
+			next[j] = k;
+		}
+		else
+			k = next[k];
+	}
+}
+
+int main() {
+	string t;
+	cin >> t;
+	int* next = new int[t.length()];
+	GetNext(t, next);
+	for (int i = 0; i < t.length() ; i++) {
+		cout << i << "   next: " << next[i] << endl;
+	}
+	return 0;
+}
+
+
+2、求nextval值
+
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+void GetNextval(string t, int* nextval) {
+	int j = 0, k = -1;
+	nextval[0] = -1;
+	while (j < t.length() - 1) {
+		if (k == -1 || t[j] == t[k]) {
+			j++;
+			k++;
+			if (t[j] != t[k])
+				nextval[j] = k;
+			else
+				nextval[j] = nextval[k];
+		}
+		else
+			k = nextval[k];
+	}
+}
+
+int main() {
+	string t;
+	cin >> t;
+	int* nextval = new int[t.length()];
+	GetNextval(t, nextval);
+	for (int i = 0; i < t.length() ; i++) {
+		cout << i << "   next: " << nextval[i] << endl;
+	}
+	return 0;
+}

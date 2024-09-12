@@ -1,0 +1,134 @@
+模板单链表
+
+
+#include <iostream>
+
+using namespace std;
+
+template <class A>
+class Node {
+public:
+	A val;
+	Node<A>* next;
+	Node() { next = nullptr; };
+	Node(A v);
+};
+
+template <class A>
+Node<A>::Node(A v) {
+	val = v;
+	next = nullptr;
+}
+
+template <class T>
+class List {
+private:
+	Node<T>* head;
+	int count;
+public:
+	List();
+	bool headinsert(T);
+	bool tailinsert(T);
+	bool headDelete();
+	bool tailDelete();
+	void showlist();
+	~List();
+};
+
+template <class T>
+List<T>::List() {
+	head = new Node<T>();
+	count = 0;
+}
+
+template <class T>
+bool List<T>::headinsert(T v) {
+	Node<T>* s = new Node<T>(v);
+	s->next = head->next;
+	head->next = s;
+	count++;
+	return true;
+}
+
+template <class T>
+bool List<T>::tailinsert(T v) {
+	Node<T>* s = new Node<T>(v);
+	Node<T>* p = head;
+	while (p->next != nullptr)
+		p = p->next;
+	s->next = p->next;
+	p->next = s;
+	count++;
+	return true;
+}
+
+template<class T>
+bool List<T>::headDelete() {
+	if (count <= 0)
+		return false;
+	Node<T>* p = head->next;
+	head->next = p->next;
+	delete p;
+	count--;
+	return true;
+}
+
+template <class T>
+bool List<T>::tailDelete() {
+	if (count <= 0)
+		return false;
+	Node<T>* p = head;
+	Node<T>* q;
+	while (p->next != nullptr) {
+		q = p;
+		p = p->next;
+	}
+	q->next = nullptr;
+	delete p;
+	count--;
+	return true;
+}
+
+template <class T>
+void List<T>::showlist() {
+	if (count == 0)
+		return;
+	Node<T>* p = head->next;
+	while (p != nullptr) {
+		cout << p->val << "  ";
+		p = p->next;
+	}
+	cout << endl;
+}
+
+template <class T>
+List<T>::~List() {
+	Node<T>* p = head;
+	Node<T>* q;
+	if (head->next == nullptr) {
+		delete head;
+		return;
+	}
+	while (p->next != nullptr) {
+		q = p;
+		p = p->next;
+		delete q;
+	}
+	delete p;
+	return;
+}
+
+
+int main() {
+	List<double> l;
+	for (int i = 5; i >= 0; i--) {
+		l.headinsert(i);
+	}
+	for (int i = 6; i <= 10; i++) {
+		l.tailinsert(i);
+	}
+	l.showlist();
+	l.headDelete();
+	l.tailDelete();
+	l.showlist();
+}

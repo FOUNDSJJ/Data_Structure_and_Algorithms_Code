@@ -1,0 +1,186 @@
+队列—迷宫
+
+
+#include <iostream>
+#include <queue>
+#include <vector>
+
+using namespace std;
+
+int dx[] = { -1,0,1,0 };
+int dy[] = { 0,1,0,-1 };
+
+int mg[5][5] = {
+	{0,1,0,0,0},
+	{0,0,0,1,0},
+	{0,1,1,0,0},
+	{0,0,0,0,0}
+};
+
+int m = 5, n = 5;
+
+struct Box {
+	int i, j;
+	Box* pre;
+	Box() {};
+	Box(int i1,int j1) {
+		i = i1;
+		j = j1;
+		pre = nullptr;
+	}
+};
+
+void display(queue<Box*>& qu) {
+	vector<Box> apath;
+	Box* b;
+	b = qu.front();
+	while (b != nullptr) {
+		apath.push_back(Box(b->i, b->j));
+		b = b->pre;
+	}
+	cout << "一条迷宫路径：";
+	for (int i = apath.size() - 1; i >= 0; i--)
+		cout << "(" << apath[i].i << "," << apath[i].j << ")";
+	cout << endl;
+}
+
+bool seekpath(int xi, int yi, int xe, int ye) {
+	Box* b,* b1;
+	queue<Box*> qu;
+	b = new Box(xi, yi);
+	qu.push(b);
+	mg[xi][yi] = -1;
+	while (!qu.empty()) {
+		b = qu.front();
+		if (b->i == xe && b->j == ye) {
+			display(qu);
+			return true;
+		}
+		qu.pop();
+		for (int di = 0; di < 4; di++) {
+			int i = b->i + dx[di];
+			int j = b->j + dy[di];
+			if (i >= 0 && i < m && j >= 0 && j < m && mg[i][j] == 0) {
+				b1 = new Box(i, j);
+				b1->pre = b;
+				qu.push(b1);
+				mg[i][j] = -1;
+			}
+		}
+	}
+	return false;
+}
+
+int main() {
+	int xi = 0, yi = 0, xe = 4, ye = 4;
+	if (!seekpath(xi, yi, xe, ye))
+		cout << "不存在路径" << endl;
+	return 0;
+}
+
+
+
+自定义迷宫路径游戏
+
+
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+int m, n;
+
+int dx[] = { 0,1,0,-1 };
+int dy[] = { -1,0,1,0 };
+
+struct Box {
+	int x, y;
+	Box* pre;
+	Box();
+	Box(int, int);
+};
+
+Box::Box() {
+	pre = nullptr;
+}
+
+Box::Box(int x1, int y1) {
+	x = x1;
+	y = y1;
+	pre = nullptr;
+}
+
+bool display(queue<Box*> qu) {
+	if (qu.empty())
+		return false;
+	Box* b = qu.front();
+	cout << "最佳路径：";
+	while (b != nullptr) {
+		if (b->pre == nullptr) {
+			cout << "( " << b->x << " , " << b->y << " )" << endl;
+			break;
+		}
+		cout << "( " << b->x << " , " << b->y << " )" << "<--";
+		b = b->pre;
+	}
+	return true;
+}
+
+bool seekpath(int xi, int yi, int xe, int ye, int* mg[]) {
+	Box* b;
+	b = new Box(xi, yi);
+	queue<Box*> qu;
+	qu.push(b);
+	mg[xi][yi] = -1;
+	Box* b1;
+	while (!qu.empty()) {
+		b = qu.front();
+		if (b->x == xe && b->y == ye) {
+			display(qu);
+			return true;
+		}
+		qu.pop();
+		for (int i = 0; i < 4; i++) {
+			int x = b->x + dx[i];
+			int y = b->y + dy[i];
+			if (x >= 0 && x < m && y >= 0 && y < n && mg[x][y] == 0) {
+				b1 = new Box(x, y);
+				b1->pre = b;
+				qu.push(b1);
+				mg[x][y] = -1;
+			}
+		}
+	}
+	return false;
+}
+
+int main() {
+FLAG1:
+	cout << "请输入迷宫的长和宽：";
+	cin >> m >> n;
+	if (m <= 0 || n <= 0)
+		goto FLAG1;
+	int** mg = new int*[m];
+	cout << "请输入迷宫情况（用1代表墙，0代表可以通过的路）" << endl;
+	for (int i = 0; i < m; i++) {
+		mg[i] = new int[n];
+		for (int j = 0; j < n; j++) {
+			cin >> mg[i][j];
+		}
+	}
+	int xi, yi;
+	int xe, ye;
+FLAG2:
+	cout << "请输入迷宫的入口：";
+	cin >> xi >> yi;
+	if (xi<0 || xi>=m || yi<0 || yi>=n)
+		goto FLAG2;
+FLAG3:
+	cout << "请输入迷宫的出口：";
+	cin >> xe >> ye;
+	if (xe<0 || xe>=m || ye<0 || ye>=n)
+		goto FLAG3;
+	if(!seekpath(xi, yi, xe, ye, mg))
+		cout << "不存在路径！！！" << endl;
+	return 0;
+}

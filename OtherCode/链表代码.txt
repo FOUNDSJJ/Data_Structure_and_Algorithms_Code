@@ -1,0 +1,643 @@
+链表代码
+
+NO.1 单链表
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	Node* next;
+	Node();
+	Node(int v);
+};
+
+Node::Node() {
+	next = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void headinsert(int);
+	void tailinsert(int);
+	void betweeninsert(int, int);
+	void Delete(int);
+	Node* getval(int);
+	void showlist();
+	~list();
+private:
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	count= 0;
+}
+
+list::~list() {
+	Node* p = head;
+	while (p != nullptr) {
+		Node* q = p->next;
+		delete p;
+		p = q;
+	}
+	cout << "链表已经被析构" << endl;
+}
+
+void list::headinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head->next;
+	if (count == 0) {
+		count++;
+		head->next = s;
+		return;
+	}
+	else {
+		count++;
+		s->next = p;
+		head->next = s;
+		return;
+	}
+}
+
+void list::tailinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head;
+	while (p->next != nullptr) {
+		p = p->next;
+	}
+	p->next = s;
+	count++;
+	return;
+}
+
+void list::betweeninsert(int i, int v) {
+	Node* s = new Node(v);
+	if (i<0 || i>count) {
+		cout << "插入的位置不在链表长度以内，插入失败" << endl;
+		return;
+	}
+	else {
+		if (i == 0) {
+			headinsert(v);
+			return;
+		}
+		else {
+			if (i == count) {
+				tailinsert(v);
+				return;
+			}
+			else {
+				count++;
+				Node* p = head;
+				for (int j = 0; j < i; j++) {
+					p = p->next;
+				}
+				s->next = p->next;
+				p->next = s;
+				return;
+			}
+		}
+	}
+}
+
+void list::Delete(int i) {
+	Node* p = head;
+	if (i<0 || i>=count) {
+		cout << "链表上不存在要删除的元素" << endl;
+		return;
+	}
+	else {
+                count--;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+		}
+		Node* q = p->next;
+		p->next = q->next;
+		delete q;
+		return;
+	}
+}
+
+Node* list::getval(int i) {
+	if (i < 0 || i >= count) {
+		cout << "链表上不存在该元素" << endl;
+		return nullptr;
+	}
+	else {
+		Node* p = head->next;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+		}
+		cout << p->val << endl;
+		return p;
+	}
+}
+
+void list::showlist() {
+	Node* p = head->next;
+	while(p!=nullptr) {
+		cout << p->val << "-->";
+		p = p->next;
+	}
+	cout << "nullptr";
+	return;
+}
+
+int main() {
+	list a;
+	int x = 0;
+	while (x == 0) {
+		cin >> x;
+		if (x == 1) {
+			int val;
+			cin >> val;
+			a.headinsert(val);
+			x = 0;
+		}
+		if (x == 2) {
+			int val;
+			cin >> val;
+			a.tailinsert(val);
+			x = 0;
+		}
+		if (x == 3) {
+			int val, i;
+			cin >> i >> val;
+			a.betweeninsert(i, val);
+			x = 0;
+		}
+		if (x == 4) {
+			int i;
+			cin >> i;
+			a.Delete(i);
+			x = 0;
+		}
+		if (x == 5) {
+			int i;
+			cin >> i;
+			a.getval(i);
+			x = 0;
+		}
+		if (x == 6) {
+			a.showlist();
+			x = 0;
+		}
+		if (x == -1) {
+			break;
+		}
+	}
+	return 0;
+}
+
+
+双链表
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	Node* next;
+	Node* prior;
+	Node();
+	Node(int v);
+};
+
+Node::Node() {
+	next = nullptr;
+	prior = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+	prior = nullptr;
+}
+
+class list {
+public:
+	list();
+	void headinsert(int);
+	void tailinsert(int);
+	void betweeninsert(int, int);
+	void Delete(int);
+	Node* getval(int);
+	void showlist();
+	~list();
+private:
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	count= 0;
+}
+
+list::~list() {
+	Node* p = head;
+	while (p != nullptr) {
+		Node* q = p->next;
+		delete p;
+		p = q;
+	}
+	cout << "链表已经被析构" << endl;
+}
+
+void list::headinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head->next;
+	if (count == 0) {
+		count++;
+		head->next = s;
+		s->prior = head;
+		return;
+	}
+	else {
+		count++;
+		s->next = p;
+		p->prior = s;
+		head->next = s;
+		s->prior = head;
+		return;
+	}
+}
+
+void list::tailinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head;
+	while (p->next != nullptr) {
+		p = p->next;
+	}
+	p->next = s;
+	s->prior = p;
+	count++;
+	return;
+}
+
+void list::betweeninsert(int i, int v) {
+	Node* s = new Node(v);
+	if (i<0 || i>count) {
+		cout << "插入的位置不在链表长度以内，插入失败" << endl;
+		return;
+	}
+	else {
+		if (i == 0) {
+			headinsert(v);
+			return;
+		}
+		else {
+			if (i == count) {
+				tailinsert(v);
+				return;
+			}
+			else {
+				count++;
+				Node* p = head;
+				for (int j = 0; j < i; j++) {
+					p = p->next;
+				}
+				Node* q = p->next;
+				s->next = q;
+				q->prior = s;
+				p->next = s;
+				s->prior = p;
+				return;
+			}
+		}
+	}
+}
+
+void list::Delete(int i) {
+	Node* p = head;
+	if (i<0 || i>=count) {
+		cout << "链表上不存在要删除的元素" << endl;
+		return;
+	}
+	else {
+		count--;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+		}
+		Node* q = p->next;
+		if(q==nullptr||q->next==nullptr)
+			p->next = nullptr;
+		else {
+			p->next = q->next;
+			q->next->prior = p;
+		}
+		delete q;
+		return;
+	}
+}
+
+Node* list::getval(int i) {
+	if (i < 0 || i >= count) {
+		cout << "链表上不存在该元素" << endl;
+		return nullptr;
+	}
+	else {
+		Node* p = head->next;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+		}
+		cout << p->val << endl;
+		return p;
+	}
+}
+
+void list::showlist() {
+	Node* p = head->next;
+	Node* q;
+	cout << " 正向 ：";
+	while(p!=nullptr) {
+		cout << p->val << "-->";
+		q = p;
+		p = p->next;
+	}
+	cout << "nullptr" << endl;
+	cout << " 逆向 ：";
+	while (q != head) {
+		cout << q->val << "-->";
+		q = q->prior;
+	}
+	cout << "head" << endl;
+	return;
+}
+
+int main() {
+	list a;
+	int x = 0;
+	while (x == 0) {
+		cin >> x;
+		if (x == 1) {
+			int val;
+			cin >> val;
+			a.headinsert(val);
+			x = 0;
+		}
+		if (x == 2) {
+			int val;
+			cin >> val;
+			a.tailinsert(val);
+			x = 0;
+		}
+		if (x == 3) {
+			int val, i;
+			cin >> i >> val;
+			a.betweeninsert(i, val);
+			x = 0;
+		}
+		if (x == 4) {
+			int i;
+			cin >> i;
+			a.Delete(i);
+			x = 0;
+		}
+		if (x == 5) {
+			int i;
+			cin >> i;
+			a.getval(i);
+			x = 0;
+		}
+		if (x == 6) {
+			a.showlist();
+			x = 0;
+		}
+		if (x == -1) {
+			break;
+		}
+	}
+	return 0;
+}
+
+
+循环单链表
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	Node* next;
+	Node();
+	Node(int v);
+};
+
+Node::Node() {
+	next = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void headinsert(int);
+	void tailinsert(int);
+	void betweeninsert(int, int);
+	void Delete(int);
+	Node* getval(int);
+	void showlist();
+	~list();
+private:
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	head->next = head;
+	count = 0;
+}
+
+list::~list() {
+	Node* p = head;
+	if (p->next == nullptr)
+		delete p;
+	else {
+		p = p->next;
+		while (p != head) {
+			Node* q = p->next;
+			delete p;
+			p = q;
+		}
+		delete p;
+	}
+	cout << "链表已经被析构" << endl;
+}
+
+void list::headinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head->next;
+	if (count == 0) {
+		count++;
+		head->next = s;
+		s->next = head;
+		return;
+	}
+	else {
+		count++;
+		s->next = p;
+		head->next = s;
+		return;
+	}
+}
+
+void list::tailinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head;
+	while (p->next != head) {
+		p = p->next;
+	}
+	p->next = s;
+	s->next = head;
+	count++;
+	return;
+}
+
+void list::betweeninsert(int i, int v) {
+	Node* s = new Node(v);
+	if (i<0 ) {
+		cout << "插入的位置不在链表长度以内，插入失败" << endl;
+		return;
+	}
+	else {
+		if (i == 0) {
+			headinsert(v);
+			return;
+		}
+		else {
+			if (i == count) {
+				tailinsert(v);
+				return;
+			}
+			else {
+				count++;
+				Node* p = head;
+				for (int j = 0; j < i; j++) {
+					p = p->next;
+					if (p == head)
+						j--;
+				}
+				s->next = p->next;
+				p->next = s;
+				return;
+			}
+		}
+	}
+}
+
+void list::Delete(int i) {
+	Node* p = head;
+	if (i < 0 ) {
+		cout << "链表上不存在要删除的元素" << endl;
+		return;
+	}
+	else {
+		count--;
+			for (int j = 0; j < i; j++) {
+				p = p->next;
+				if (p == head)
+					j--;
+			}
+		Node* q = p->next;
+		p->next = q->next;
+		delete q;
+		return;
+	}
+}
+
+Node* list::getval(int i) {
+	if (i < 0 ) {
+		cout << "链表上不存在该元素" << endl;
+		return nullptr;
+	}
+	else {
+		Node* p = head->next;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+			if (p == head)
+				j--;
+		}
+		cout << p->val << endl;
+		return p;
+	}
+}
+
+void list::showlist() {
+	Node* p = head->next;
+	cout << "head-->";
+	while (p != head) {
+		cout << p->val << "-->";
+		p = p->next;
+	}
+	cout << "head";
+	return;
+}
+
+int main() {
+	list a;
+	int x = 0;
+	while (x == 0) {
+		cin >> x;
+		if (x == 1) {
+			int val;
+			cin >> val;
+			a.headinsert(val);
+			x = 0;
+		}
+		if (x == 2) {
+			int val;
+			cin >> val;
+			a.tailinsert(val);
+			x = 0;
+		}
+		if (x == 3) {
+			int val, i;
+			cin >> i >> val;
+			a.betweeninsert(i, val);
+			x = 0;
+		}
+		if (x == 4) {
+			int i;
+			cin >> i;
+			a.Delete(i);
+			x = 0;
+		}
+		if (x == 5) {
+			int i;
+			cin >> i;
+			a.getval(i);
+			x = 0;
+		}
+		if (x == 6) {
+			a.showlist();
+			x = 0;
+		}
+		if (x == -1) {
+			break;
+		}
+	}
+	return 0;
+}

@@ -1,0 +1,203 @@
+数据结构b作业2
+
+
+
+T1
+
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+
+using namespace std;
+
+class BTNode {
+public:
+	int val;
+	BTNode* lchild;
+	BTNode* rchild;
+	BTNode() :val(-1), lchild(nullptr), rchild(nullptr) {};
+	BTNode(int v) :val(v), lchild(nullptr), rchild(nullptr) {};
+};
+
+void CreateBTree(string& st, BTNode*& root) {
+	int i = 0, top = -1, k = -1;
+	BTNode* St[2000];
+	BTNode* p = nullptr;
+	root = nullptr;
+	char ch = st[i];
+	string temp = "";
+	while (ch != '\0') {
+	FLAG:
+		if (ch == ' ')
+			goto FLAG1;
+		if (ch == '(') {
+			top++;
+			St[top] = p;
+			k = 1;
+		}
+		if (ch == ')') {
+			top--;
+		}
+		if (ch == ',') {
+			k = 2;
+		}
+		if (ch <= '9' && ch >= '0') {
+			while (ch <= '9' && ch >= '0') {
+				temp += ch;
+				i++;
+				ch = st[i];
+			}
+			int v = stoi(temp);
+			p = new BTNode(v);
+			temp = "";
+			if (root == nullptr) {
+				root = p;
+			}
+			else {
+				switch (k) {
+				case 1:
+					St[top]->lchild = p;
+					break;
+				case 2:
+					St[top]->rchild = p;
+					break;
+				}
+			}
+			goto FLAG;
+		}
+	FLAG1:
+		i++;
+		ch = st[i];
+	}
+}
+
+bool CollectBTreeLeaf(BTNode* root, vector<int>& vec) {
+	if (root == nullptr)
+		return false;
+	if (root->lchild == nullptr && root->rchild == nullptr) {
+		vec.push_back(root->val);
+		return true;
+	}
+	if (root->lchild != nullptr)
+		CollectBTreeLeaf(root->lchild, vec);
+	if (root->rchild != nullptr)
+		CollectBTreeLeaf(root->rchild, vec);
+	return true;
+}
+
+bool Compare(vector<int>& vec1, vector<int>& vec2) {
+	vector<int>::iterator it1 = vec1.begin();
+	vector<int>::iterator it2 = vec2.begin();
+	while (it1 != vec1.end() && it2 != vec2.end()) {
+		if (*it1 != *it2)
+			return false;
+		it1++;
+		it2++;
+		if (it1 == vec1.end() && it2 != vec2.end())
+			return false;
+		if (it1 != vec1.end() && it2 == vec2.end())
+			return false;
+	}
+	return true;
+}
+
+void DisLeaf1(vector<int>& vec) {
+	if (vec.empty())
+		return;
+	else {
+		for (vector<int>::iterator i = vec.begin(); i != vec.end(); i++)
+			cout << *i << " ";
+	}
+	cout << endl;
+	return;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	string st[2];
+	st[0] = "";
+	st[1] = "";
+	while (st[0] == "")
+		ifs >> st[0];
+	while (st[1] == "")
+		ifs >> st[1];
+	ifs.close();
+	vector<int> vec1, vec2;
+	BTNode* root1 = nullptr;
+	BTNode* root2 = nullptr;
+	CreateBTree(st[0], root1);
+	CreateBTree(st[1], root2);
+	CollectBTreeLeaf(root1, vec1);
+	CollectBTreeLeaf(root2, vec2);
+	if (Compare(vec1, vec2))
+		cout << "true";
+	else
+		cout << "false";
+	return 0;
+}
+
+
+
+
+T2
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+void postorder(int* preorder, int* inorder, int lenght) {
+	int len = lenght;
+	if (len == 0)
+		return;
+	if (len == 1) {
+		cout << preorder[0] << " ";
+		return;
+	}
+	int pos = -1;
+	for (int i = 0; i < len ; i++) {
+		if (preorder[0] == inorder[i]) {
+			pos = i;
+			break;
+		}
+	}
+	int* pretemp = new int[pos];
+	int* intemp = new int[pos];
+	for (int m = 1; m <= pos; m++)
+		pretemp[m - 1] = preorder[m];
+	for (int n = 0; n <= pos-1; n++)
+		intemp[n] = inorder[n];
+	postorder(pretemp, intemp, pos);
+	delete[] pretemp;
+	delete[] intemp;
+	int* pretemp1 = new int[len - pos - 1];
+	int* intemp1 = new int[len - pos - 1];
+	for (int m = 1; m <= (len - pos - 1); m++)
+		pretemp1[m - 1] = preorder[m + pos];
+	for (int m = 1; m <= (len - pos - 1); m++)
+		intemp1[m - 1] = inorder[m + pos];
+	postorder(pretemp1, intemp1, len - pos - 1);
+	delete[] pretemp1;
+	delete[] intemp1;
+	cout << preorder[0] << " ";
+	return;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int num = 0;
+	ifs >> num;
+	int* preorder = new int[num];
+	int* inorder = new int[num];
+	for (int i = 0; i < num; i++)
+		ifs >> preorder[i];
+	for (int j = 0; j < num; j++)
+		ifs >> inorder[j];
+	ifs.close();
+	postorder(preorder, inorder, num);
+	return 0;
+}

@@ -1,0 +1,134 @@
+数据结构b作业5
+
+
+
+
+T1
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+vector<int> vec;
+
+class HashNode {
+public:
+	int key;
+	int SearchCount;
+	HashNode() :key(0), SearchCount(0) {};
+	HashNode(int k) :key(k), SearchCount(0) {};
+	void Changekey(int k) { key = k; };
+};
+
+bool InsertHash(int hash, HashNode* arr, int k) {
+	if (arr == nullptr || hash < 0 || hash>199 || k <= 0)
+		return false;
+	while (arr[hash].SearchCount != 0)
+		hash = (hash + 1) % 200;
+	arr[hash].Changekey(k);
+	arr[hash].SearchCount++;
+	return true;
+}
+
+bool Seek(int Goal, HashNode* arr) {
+	if (arr == nullptr || Goal <= 0)
+		return false;
+	int hash = Goal % 199;
+	while (arr[hash].key != Goal && arr[hash].key != 0) {
+		vec.push_back(arr[hash].key);
+		hash = (hash + 1) % 200;
+		if (hash == Goal % 199)
+			break;
+	}
+	if (arr[hash].key == Goal) {
+		vec.push_back(Goal);
+		return true;
+	}
+	return false;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int Goal = 0, k = 0;
+	ifs >> Goal;
+	HashNode* arr = new HashNode[200];
+	while (ifs >> k) {
+		int hash = k % 199;
+		if (!InsertHash(hash, arr, k)) {
+			cout << "hash插入失败！！！" << endl;
+			break;
+		}
+	}
+	ifs.close();
+	ofstream ofs("out.txt");
+	if (Seek(Goal, arr))
+		ofs << "True" << endl;
+	else
+		ofs << "False" << endl;
+	for (vector<int>::iterator it = vec.begin(); it != vec.end(); it++)
+		ofs << *it << " ";
+	ofs.close();
+	delete[] arr;
+	return 0;
+}
+
+
+
+
+T2
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+void ShellSort(int* arr, int num) {
+	if (arr == nullptr)
+		return;
+	int d = num / 2;
+	while (d > 0) {
+		for (int i = d; i < num; i++) {
+			if (arr[i] < arr[i - d]) {
+				int a = arr[i];
+				int j = i - d;
+				arr[i] = arr[j];
+				j -= d;
+				while (j >= 0 && arr[j] > a) {
+					arr[j+d] = arr[j];
+					j -= d;
+				}
+				arr[j + d] = a;
+			}
+		}
+		d /= 2;
+	}
+	return;
+}
+
+void Display(int* arr, int num,ofstream& ofs) {
+	int i = 0;
+	while (i < num) {
+		ofs << arr[i] << " ";
+		i++;
+	}
+	return;
+}
+
+int main() {
+	int arr[200000];
+	int num = 0;
+	ifstream ifs("in.txt");
+	while (ifs >> arr[num])
+		num++;
+	ShellSort(arr, num);
+	ofstream ofs("out.txt");
+	Display(arr, num, ofs);
+	ifs.close();
+	ofs.close();
+	return 0;
+}

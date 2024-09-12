@@ -1,0 +1,700 @@
+数据结构b实验1
+
+
+T1
+
+#include <iostream>
+#include <fstream>
+#include <set>
+
+using namespace std;
+
+int calulate(int** Mat, int i, int j, int x, int y) {
+	int result = 0;
+	for (int a = 0; a < x; a++)
+		for (int b = 0; b < y; b++)
+			result += Mat[i + a][j + b];
+	return result;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int m = 0, n = 0, x = 0, y = 0;
+	ifs >> m >> n >> x >> y;
+	int** Mat = new int* [m];
+	for (int i = 0; i < m; i++) {
+		Mat[i] = new int[n];
+		for (int j = 0; j < n; j++)
+			ifs >> Mat[i][j];
+	}
+	ifs.close();
+	set<int> Ms;
+	for (int i = 0; i <= m-x; i++) 
+		for (int j = 0; j <= n - y; j++)
+			Ms.insert(calulate(Mat, i, j, x, y));
+	set<int>::iterator it = Ms.end();
+	it--;
+	cout << *(it);
+	for (int i = 0; i < m; i++) 
+		delete[] Mat[i];
+	delete Mat;
+	return 0;
+}
+
+
+
+
+T2
+
+
+
+#include <iostream>
+#include <string>
+#include <queue>
+
+using namespace std;
+
+class BTNode {
+public:
+	char val;
+	BTNode* lchild;
+	BTNode* rchild;
+	BTNode() :val(), lchild(nullptr), rchild(nullptr) {};
+	BTNode(char ch) :val(ch), lchild(nullptr), rchild(nullptr) {};
+};
+
+void CreateBTree(string& st, BTNode*& root) {
+	int i = 0, top = -1, k = -1;
+	BTNode* St[2000];
+	BTNode* p = nullptr;
+	char ch = st[i];
+	while (ch != '\0') {
+		if (ch == '(') {
+			top++;
+			St[top] = p;
+			k = 1;
+		}
+		if (ch == ')') {
+			top--;
+		}
+		if (ch == ',') {
+			k = 2;
+		}
+		if ((ch <= 'Z' && ch >= 'A') || (ch <= 'z' && ch >= 'a')) {
+			p = new BTNode(ch);
+			if (root == nullptr)
+				root = p;
+			else {
+				switch (k) {
+				case 1:
+					St[top]->lchild = p;
+					break;
+				case 2:
+					St[top]->rchild = p;
+					break;
+				}
+			}
+		}
+		i++;
+		ch = st[i];
+	}
+}
+
+void ShowBTree(BTNode* root) {
+	if (root == nullptr)
+		return;
+	else {
+		queue<BTNode*> QBT;
+		QBT.push(root);
+		BTNode* p = nullptr;
+		while (!QBT.empty()) {
+			p = QBT.front();
+			cout << p->val << " ";
+			QBT.pop();
+			if (p->lchild != nullptr)
+				QBT.push(p->lchild);
+			if (p->rchild != nullptr)
+				QBT.push(p->rchild);
+		}
+	}
+	cout << endl;
+	return;
+}
+
+void PreBTree(BTNode* root, string& pre) {
+	if (root == nullptr)
+		return;
+	pre += root->val;
+	PreBTree(root->lchild, pre);
+	PreBTree(root->rchild, pre);
+	return;
+}
+
+void InBTree(BTNode* root, string& in) {
+	if (root == nullptr)
+		return;
+	InBTree(root->lchild, in);
+	in += root->val;
+	InBTree(root->rchild, in);
+	return;
+}
+
+void PostBTree(BTNode* root, string& post) {
+	if (root == nullptr)
+		return;
+	PostBTree(root->lchild, post);
+	PostBTree(root->rchild, post);
+	post += root->val;
+	return;
+}
+
+int Height(BTNode* root) {
+	if (root == nullptr)
+		return 0;
+	int height = 0;
+	queue<BTNode*> QBT;
+	QBT.push(root);
+	while (!QBT.empty()) {
+		height++;
+		queue<BTNode*> temp;
+		while (!QBT.empty()) {
+			temp.push(QBT.front());
+			QBT.pop();
+		}
+		while (!temp.empty()) {
+			if (temp.front()->lchild != nullptr)
+				QBT.push(temp.front()->lchild);
+			if (temp.front()->rchild != nullptr)
+				QBT.push(temp.front()->rchild);
+			temp.pop();
+		}
+	}
+	return height;
+}
+
+void CreateBTree_By_Order(string pre, string in, BTNode*& root) {
+	if (pre.length() == 0)
+		return;
+	int pos = in.find(pre[0]);
+	string lpre = pre.substr(1, pos);
+	string rpre = pre.substr(pos + 1, pre.length() - pos - 1);
+	string lin = in.substr(0, pos);
+	string rin = in.substr(pos + 1, in.length() - pos - 1);
+	if (lpre.length() != 0) {
+		BTNode* p = new BTNode(lpre[0]);
+		root->lchild = p;
+		CreateBTree_By_Order(lpre, lin, root->lchild);
+	}
+	if (rpre.length() != 0) {
+		BTNode* p = new BTNode(rpre[0]);
+		root->rchild = p;
+		CreateBTree_By_Order(rpre, rin, root->rchild);
+	}
+	return;
+}
+
+int main() {
+	string st;
+	cin >> st;
+	BTNode* root = nullptr;
+	CreateBTree(st, root);
+	//ShowBTree(root);
+	string pre = "", in = "", post = "";
+	PreBTree(root, pre);
+	InBTree(root, in);
+	cout << pre << endl << in << endl;
+	int height = Height(root);
+	cout << height << endl;
+	BTNode* root1 = new BTNode(pre[0]);
+	CreateBTree_By_Order(pre, in, root1);
+	PostBTree(root1,post);
+	cout << post;
+	return 0;
+}
+
+
+
+T3
+
+
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int Num(string Cur, string Dec) {
+	int num = 0;
+	int i = 0, j = 0;
+	while (i < (int)Cur.length()) {
+		while (i < (int)Cur.length()&& Cur[i] == Dec[j]) {
+			if (j == (int)Dec.length()-1) {
+				num++;
+				j = 0;
+				break;
+			}
+			i++;
+			j++;
+		}
+		j = 0;
+		i++;
+	}
+	return num;
+}
+
+int main() {
+	string Cur = "", Dec = "";
+	cin >> Cur >> Dec;
+	cout << Num(Cur, Dec);
+}
+
+
+
+AT1
+
+
+#include <iostream>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	int row;
+	int arrange;
+	Node* next;
+	Node();
+	Node(int r, int a, int v);
+};
+
+Node::Node() {
+	row = -1;
+	arrange = -1;
+	val = -1;
+	next = nullptr;
+}
+
+Node::Node(int r, int a, int v) {
+	row = r;
+	arrange = a;
+	val = v;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void showlist();
+	void judgeinsert(int r, int a, int v);
+	~list();
+	Node* head;
+};
+
+list::list() {
+	head = new Node();
+}
+
+list::~list() {
+	Node* p = head;
+	while (p != nullptr) {
+		Node* q = p->next;
+		delete p;
+		p = q;
+	}
+}
+
+void list::judgeinsert(int r, int a, int v) {
+	Node* s = new Node(r, a, v);
+	Node* p = head;
+	while (p->next != nullptr && (p->next->row < r || (p->next->row == r && p->next->arrange < a)))
+		p = p->next;
+	s->next = p->next;
+	p->next = s;
+	return;
+}
+
+void list::showlist() {
+	Node* p = head->next;
+	while (p != nullptr) {
+		cout << p->row << " " << p->arrange << " " << p->val << endl;
+		p = p->next;
+	}
+	return;
+}
+
+void CreateTMat(list& Mat, list& TMat) {
+	Node* p = Mat.head->next;
+	while (p != nullptr) {
+		TMat.judgeinsert(p->arrange, p->row, p->val);
+		p = p->next;
+	}
+	return;
+}
+
+int main() {
+	list Mat;
+	int row = 0, arrange = 0, num = 0;
+	cin >> row >> arrange >> num;
+	for (int i = 0; i < num; i++) {
+		int r = -1, a = -1, v = -1;
+		cin >> r >> a >> v;
+		Mat.judgeinsert(r, a, v);
+	}
+	list TMat;
+	CreateTMat(Mat, TMat);
+	cout << arrange << " " << row << " " << num << endl;
+	TMat.showlist();
+	return 0;
+}
+
+
+AT2
+
+
+#include <iostream>
+#include <string>
+#include <stack>
+#include <queue>
+
+using namespace std;
+
+class BTNode {
+public:
+	string val;
+	BTNode* lchild;
+	BTNode* rchild;
+	BTNode() :val(""), lchild(nullptr), rchild(nullptr) {};
+	BTNode(string v) :val(v), lchild(nullptr), rchild(nullptr) {};
+};
+
+void Trans(stack<string>& num, stack<string>& opor) {
+	char ch;
+	while (cin >> ch) {
+	FALG:
+		if (ch == '+' || ch == '-') {
+			while (!opor.empty() && opor.top() != "(") {
+				string temp = opor.top();
+				num.push(temp);
+				opor.pop();
+			}
+			string s = "";
+			s += ch;
+			opor.push(s);
+		}
+		if (ch == '(') {
+			string s = "";
+			s += ch;
+			opor.push(s);
+		}
+		if (ch == ')') {
+			while (!opor.empty() && opor.top() != "(") {
+				string temp = opor.top();
+				num.push(temp);
+				opor.pop();
+			}
+			opor.pop();
+		}
+		if (ch == '*' || ch == '/') {
+			while (!opor.empty() && opor.top() != "(" && (opor.top() == "*" || opor.top() == "/")) {
+				string temp = opor.top();
+				num.push(temp);
+				opor.pop();
+			}
+			string s = "";
+			s += ch;
+			opor.push(s);
+		}
+		else {
+			string d = "";
+			while (ch <= '9' && ch >= '0') {
+				d += ch;
+				if (!(cin >> ch)) {
+					num.push(d);
+					break;
+				}
+				if (ch <= '9' && ch >= '0') {
+					d += ch;
+					if (!(cin >> ch)) {
+						num.push(d);
+						break;
+					}
+					if (!(ch <= '9' && ch >= '0')) {
+						num.push(d);
+						goto FALG;
+					}
+				}
+				if (!(ch <= '9' && ch >= '0')) {
+					num.push(d);
+					goto FALG;
+				}
+			}
+		}
+	}
+	while (!opor.empty()) {
+		string e = opor.top();
+		num.push(e);
+		opor.pop();
+	}
+}
+
+void caculate(int& sum, stack<int> num1, stack<string> opor,stack<string> num) {
+	while (!num.empty()) {
+		string e = num.top();
+		opor.push(e);
+		num.pop();
+	}
+	int n1 = 0, n2 = 0;
+	string str;
+	while (!opor.empty()) {
+		int temp = 0;
+		str = opor.top();
+		opor.pop();
+		if (str == "+") {
+			n1 = num1.top();
+			num1.pop();
+			n2 = num1.top();
+			num1.pop();
+			temp = n1 + n2;
+			num1.push(temp);
+		}
+		else {
+			if (str == "-") {
+				n1 = num1.top();
+				num1.pop();
+				n2 = num1.top();
+				num1.pop();
+				temp = n2 - n1;
+				num1.push(temp);
+			}
+			else {
+				if (str == "*") {
+					n1 = num1.top();
+					num1.pop();
+					n2 = num1.top();
+					num1.pop();
+					temp = n1 * n2;
+					num1.push(temp);
+				}
+				else {
+					if (str == "/") {
+						n1 = num1.top();
+						num1.pop();
+						n2 = num1.top();
+						num1.pop();
+						temp = n2 / n1;
+						num1.push(temp);
+					}
+					else {
+						temp = stoi(str);
+						num1.push(temp);
+					}
+				}
+			}
+		}
+	}
+	sum = num1.top();
+}
+
+string Display(stack<string> st) {
+	string s = "";
+	while (!st.empty()) {
+		cout << st.top();
+		st.pop();
+	}
+	cout << endl;
+	return s;
+}
+
+void CreateBTree(stack<string>& num, BTNode*& root) {
+	if (num.empty())
+		return;
+	if (root == nullptr) {
+		BTNode* p = new BTNode(num.top());
+		num.pop();
+		root = p;
+	}
+	int i = 0;
+	if (i == 0 && (num.top() == "+" || num.top() == "-" || num.top() == "*" || num.top() == "/")) {
+		BTNode* p = new BTNode(num.top());
+		num.pop();
+		root->rchild = p;
+		CreateBTree(num, root->rchild);
+		i = 1;
+	}
+	else {
+		BTNode* p = new BTNode(num.top() + "#");
+		num.pop();
+		root->rchild = p;
+		i = 1;
+	}
+	if (i == 1 && (num.top() == "+" || num.top() == "-" || num.top() == "*" || num.top() == "/")) {
+		BTNode* p = new BTNode(num.top());
+		num.pop();
+		root->lchild = p;
+		CreateBTree(num, root->lchild);
+	}
+	else {
+		BTNode* p = new BTNode(num.top() + "#");
+		num.pop();
+		root->lchild = p;
+		return;
+	}
+	return;
+}
+
+void ShowBTree(BTNode* root) {
+	if (root == nullptr)
+		return;
+	else {
+		queue<BTNode*> QBT;
+		QBT.push(root);
+		BTNode* p = nullptr;
+		while (!QBT.empty()) {
+			p = QBT.front();
+			cout << p->val;
+			QBT.pop();
+			if (p->lchild != nullptr)
+				QBT.push(p->lchild);
+			if (p->rchild != nullptr)
+				QBT.push(p->rchild);
+		}
+	}
+	cout << endl;
+	return;
+}
+
+void PreBTree(BTNode* root, string& pre) {
+	if (root == nullptr)
+		return;
+	pre += root->val;
+	PreBTree(root->lchild, pre);
+	PreBTree(root->rchild, pre);
+	return;
+}
+
+void InBTree(BTNode* root, string& in) {
+	if (root == nullptr)
+		return;
+	InBTree(root->lchild, in);
+	in += root->val;
+	InBTree(root->rchild, in);
+	return;
+}
+
+void PostBTree(BTNode* root, string& post) {
+	if (root == nullptr)
+		return;
+	PostBTree(root->lchild, post);
+	PostBTree(root->rchild, post);
+	post += root->val;
+	return;
+}
+
+int main() {
+	stack<string> num;
+	stack<string> opor;
+	stack<int> num1;
+	Trans(num, opor);
+	int sum = 0;
+	caculate(sum, num1, opor, num);
+	BTNode* root = nullptr;
+	CreateBTree(num, root);
+	string pre = "", in = "", post = "";
+	PreBTree(root, pre);
+	InBTree(root, in);
+	PostBTree(root, post);
+	cout << pre << endl << in << endl << post << endl;
+	ShowBTree(root);
+	cout << sum;
+	return 0;
+}
+
+
+
+AT3
+
+
+#include <iostream>
+#include <fstream>
+#include <queue>
+
+using namespace std;
+
+class BTNode {
+public:
+	string val;
+	BTNode* lchild;
+	BTNode* rchild;
+	BTNode() :val("0"), lchild(nullptr), rchild(nullptr) {};
+	BTNode(string st) :val(st), lchild(nullptr), rchild(nullptr) {};
+	void ChangeVal(string v);
+};
+
+void BTNode::ChangeVal(string v) {
+	val = v;
+}
+
+void DealString(string& temp, string& v, string& HFM) {
+	if (temp == "")
+		return;
+	int pos = temp.find(':');
+	v = temp.substr(0, pos);
+	HFM = temp.substr(pos + 1, temp.length() - pos - 1);
+	return;
+}
+
+void CreateBTree(BTNode*& root, string& v, string& HFM) {
+	if (HFM == "") {
+		root->ChangeVal(v);
+		return;
+	}
+	char ch = HFM[0];
+	HFM.erase(0, 1);
+	if (ch == '0') {
+		if (root->lchild == nullptr)
+			root->lchild = new BTNode();
+		CreateBTree(root->lchild, v, HFM);
+	}
+	else {
+		if (root->rchild == nullptr)
+			root->rchild = new BTNode();
+		CreateBTree(root->rchild, v, HFM);
+	}
+	return;
+}
+
+void DecodeHFM(BTNode*& root, string& temp) {
+	if (root->lchild == nullptr && root->rchild == nullptr) {
+		cout << root->val;
+		return;
+	}
+	char ch = temp[0];
+	temp.erase(0, 1);
+	if (ch == '0')
+		DecodeHFM(root->lchild, temp);
+	if (ch == '1')
+		DecodeHFM(root->rchild, temp);
+	return;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int num = 0;
+	cin >> num;
+	BTNode* root = new BTNode();
+	for (int i = 0; i < num; i++) {
+		string temp = "";
+		string v = "";
+		string HFM = "";
+		cin >> temp;
+		DealString(temp, v, HFM);
+		CreateBTree(root, v, HFM);
+	}
+	string temp = "";
+	while (temp == "" ||!( temp[0] == '0' || temp[0] == '1'))
+		ifs >> temp;
+	ifs.close();
+	while (temp != "")
+		DecodeHFM(root, temp);
+	return 0;
+}

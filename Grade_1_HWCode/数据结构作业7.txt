@@ -1,0 +1,384 @@
+数据结构作业7
+
+
+T1
+
+#include <iostream>
+#include <fstream>
+#include <stack>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+int num = 0;
+
+struct TreeNode {
+	int val;
+	TreeNode* left;
+	TreeNode* right;
+	TreeNode(int x) :val(x), left(NULL), right(NULL) {};
+	TreeNode() :left(NULL), right(NULL) {};
+};
+
+void CreateBTree(TreeNode*& BTree, string& st) {
+	if (st == "") {
+		BTree = nullptr;
+		return;
+	}
+	stack<TreeNode*> temp;
+	TreeNode* p = nullptr;
+	char ch;
+	BTree = nullptr;
+	int k = 0, j = 0;
+	ch = st[j];
+	while (ch != '\0') {
+		switch (ch) {
+		case '(':
+			temp.push(p);
+			k = 1;
+			break;
+		case ')':
+			temp.pop();
+			break;
+		case ',':
+			k = 2;
+			break;
+		default:
+			int val;
+			string stemp = "";
+			while (st[j] <= '9' && st[j] >= '0') {
+				stemp += st[j];
+				j++;
+			}
+			j--;
+			val = stoi(stemp);
+			p = new TreeNode(val);
+			if (BTree == nullptr)
+				BTree = p;
+			else {
+				switch (k) {
+				case 1:
+					temp.top()->left = p;
+					break;
+				case 2:
+					temp.top()->right = p;
+					break;
+				}
+			}
+		}
+		j++;
+		ch = st[j];
+	}
+}
+
+void Getleaf(TreeNode* rt, int* rtnum) {
+	if (rt == nullptr)
+		return;
+	if (rt->left != nullptr || rt->right != nullptr) {
+		Getleaf(rt->left, rtnum);
+		Getleaf(rt->right, rtnum);
+	}
+	else {
+		rtnum[num] = rt->val;
+		num++;
+		return;
+	}
+}
+
+class Solution {
+public:
+	bool leafSimilar(TreeNode* root1, TreeNode* root2);
+};
+
+bool Solution::leafSimilar(TreeNode* root1, TreeNode* root2) {
+	int rt1[200] = { 0,0 }, rt2[200] = { 0,0 };
+	Getleaf(root1, rt1);
+	num = 0;
+	Getleaf(root2, rt2);
+	int i = 0, j = 0;
+	while (rt1[i] != 0 && rt2[j] != 0 && rt1[i] == rt2[j]) {
+		i++;
+		j++;
+	}
+	if (rt1[i] == 0 && rt2[j] == 0)
+		return true;
+	else
+		return false;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	string st[2];
+	ifs >> st[0] >> st[1];
+	ifs.close();
+	ifs.close();
+	TreeNode* root1;
+	TreeNode* root2;
+	CreateBTree(root1, st[0]);
+	CreateBTree(root2, st[1]);
+	Solution sl;
+	if (sl.leafSimilar(root1, root2) == true)
+		cout << "true";
+	else
+		cout << "false";
+}
+
+
+
+T2
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+struct TreeNode {
+	int val;
+	int fatherval;
+	TreeNode(int v, int fv) :val(v), fatherval(fv) {};
+	TreeNode() {};
+};
+
+int seek(TreeNode* TN, int val1, int val2) {
+	int fval1[10000];
+	int fval2[10000];
+	int fv1 = val1, fv2 = val2;
+	int i = 0, j = 0;
+	fval1[i] = val1;
+	i++;
+	fval2[j] = val2;
+	j++;
+	while (TN[fv1 - 1].fatherval != 0) {
+		fv1 = TN[fv1 - 1].fatherval;
+		fval1[i] = fv1;
+		i++;
+	}
+	while (TN[fv2 - 1].fatherval != 0) {
+		fv2 = TN[fv2 - 1].fatherval;
+		fval2[j] = fv2;
+		j++;
+	}
+	for (int m = 0; m <= i; m++) {
+		for (int n = 0; n <= j; n++) {
+			if (fval1[m] == fval2[n])
+				return fval1[m];
+		}
+	}
+	return -1;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int num;
+	ifs >> num;
+	TreeNode* TN = new TreeNode[num];
+	TreeNode p;
+	int root = 0;
+	int* val=new int[num-1];
+	int* arr = new int[num];
+	for (int i = 0; i < num; i++)
+		arr[i] = i + 1;
+	for (int i = 0; i < num - 1; i++) {
+		int fatherval;
+		ifs >> fatherval >> val[i];
+		arr[val[i] - 1] = 0;
+		TreeNode p(val[i], fatherval);
+		TN[val[i] - 1] = p;
+	}
+	for (int i = 0; i < num; i++) {
+		if (arr[i] != 0)
+			root = arr[i];
+	}
+	TreeNode q(root, 0);
+	TN[root - 1] = q;
+	int val1, val2;
+	ifs >> val1 >> val2;
+	int result = seek(TN, val1, val2);
+	if (result != -1)
+		cout << result;
+	ifs.close();
+	delete[] TN;
+	return 0;
+}
+
+
+
+T3
+
+
+#include <iostream>
+#include <string>
+#include "math.h"
+#include <queue>
+
+using namespace std;
+
+int a = 0;
+
+struct TreeNode {
+	int val;
+	TreeNode* left;
+	TreeNode* right;
+	TreeNode() :val(-1), left(nullptr), right(nullptr) {};
+	TreeNode(int v) :val(v), left(nullptr), right(nullptr) {};
+};
+
+queue<TreeNode*> tq;
+
+void CreateTree(TreeNode* Treeroot, int* root, int num) {
+	tq.push(Treeroot);
+	TreeNode* p;
+	while (a < num) {
+		p = tq.front();
+		tq.pop();
+		if (root[a] == -1) 
+			a++;
+		else {
+			TreeNode* temp = new TreeNode(root[a]);
+			p->left = temp;
+			tq.push(temp);
+			a++;
+		}
+		if (root[a] == -1)
+			a++;
+		else {
+			TreeNode* temp = new TreeNode(root[a]);
+			p->left = temp;
+			tq.push(temp);
+			a++;
+		}
+	}
+}
+
+int CaculateWidth(int* root, int num) {
+	int i = 0, j = 0;
+	int* width = new int[num];
+	while (i < num) {
+		width[j] = 0;
+		int n = i;
+		for (int m = n; m < num && m < n + pow(2, j); m++) {
+			if (root[i] != -1)
+				width[j]++;
+			i++;
+		}
+		j++;
+	}
+	int max = width[0];
+	i = 1;
+	while (i < j) {
+		max = width[i] > width[i - 1] ? width[i] : width[i - 1];
+		i++;
+	}
+	delete[] width;
+	return max;
+}
+
+int main() {
+	string st = "";
+	string temp1 = "";
+	while (cin >> temp1) {
+		st += temp1;
+		temp1 = "";
+	}
+	int num = 1, i = 0;
+	while (st[i] != '\0') {
+		if (st[i] == ',')
+			num++;
+		i++;
+	}
+	i = 0;
+	int j = 0;
+	int* root = new int[num];
+	string temp = "";
+	while (st[i] != '\0' && st[i] != '[')
+		i++;
+	while (st[i] != '\0') {
+		if (st[i] == ',' || st[i] == ']') {
+			if (temp == "null")
+				root[j] = -1;
+			else {
+				int val = stoi(temp);
+				root[j] = val;
+			}
+			j++;
+			temp = "";
+		}
+		if ((st[i] <= '9' && st[i] >= '0') || (st[i] <= 'z' && st[i] >= 'a'))
+			temp += st[i];
+		i++;
+	}
+	if (root[0] == -1) {
+		cout << 0;
+		return 0;
+	}
+	TreeNode* Treeroot = new TreeNode(root[0]);
+	a++;
+	CreateTree(Treeroot, root, num);
+	int max = CaculateWidth(root, num);
+	cout << max;
+	return 0;
+}
+
+
+
+T4
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+void postorder(int* preorder, int* inorder, int lenght) {
+	int len = lenght;
+	if (len == 0)
+		return;
+	if (len == 1) {
+		cout << preorder[0] << " ";
+		return;
+	}
+	int pos = -1;
+	for (int i = 0; i < len ; i++) {
+		if (preorder[0] == inorder[i]) {
+			pos = i;
+			break;
+		}
+	}
+	int* pretemp = new int[pos];
+	int* intemp = new int[pos];
+	for (int m = 1; m <= pos; m++)
+		pretemp[m - 1] = preorder[m];
+	for (int n = 0; n <= pos-1; n++)
+		intemp[n] = inorder[n];
+	postorder(pretemp, intemp, pos);
+	delete[] pretemp;
+	delete[] intemp;
+	int* pretemp1 = new int[len - pos - 1];
+	int* intemp1 = new int[len - pos - 1];
+	for (int m = 1; m <= (len - pos - 1); m++)
+		pretemp1[m - 1] = preorder[m + pos];
+	for (int m = 1; m <= (len - pos - 1); m++)
+		intemp1[m - 1] = inorder[m + pos];
+	postorder(pretemp1, intemp1, len - pos - 1);
+	delete[] pretemp1;
+	delete[] intemp1;
+	cout << preorder[0] << " ";
+	return;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int num = 0;
+	ifs >> num;
+	int* preorder = new int[num];
+	int* inorder = new int[num];
+	for (int i = 0; i < num; i++)
+		ifs >> preorder[i];
+	for (int j = 0; j < num; j++)
+		ifs >> inorder[j];
+	ifs.close();
+	postorder(preorder, inorder, num);
+	return 0;
+}

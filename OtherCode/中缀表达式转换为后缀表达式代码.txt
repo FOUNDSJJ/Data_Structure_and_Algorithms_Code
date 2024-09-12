@@ -1,0 +1,244 @@
+中缀表达式转换为后缀表达式（运算符只有“+”、“-“”、*”、“/”、“（”、“）”）
+
+
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+template<class T>
+class Stack {
+public:
+	T* arr;
+	int top;
+	Stack();
+	bool push(T);
+	bool pop();
+	bool gettop(T&);
+	T Top();
+	bool empty();
+	~Stack();
+};
+
+template<class T>
+Stack<T>::Stack() {
+	arr = new T[100];
+	top = -1;
+}
+
+template<class T>
+bool Stack<T>::push(T s) {
+	if (top < -1)
+		return false;
+	else {
+		top++;
+		arr[top] = s;
+		return true;
+	}
+}
+
+template<class T>
+bool Stack<T>::pop() {
+	if (top <= -1)
+		return false;
+	else {
+		top--;
+		return true;
+	}
+}
+
+template<class T>
+bool Stack<T>::gettop(T& s) {
+	if (top <= -1)
+		return false;
+	else {
+		s = arr[top];
+		return true;
+	}
+}
+
+template<class T>
+T Stack<T>::Top() {
+	if (top > -1) {
+		return arr[top];
+	}
+}
+
+template<class T>
+bool Stack<T>::empty() {
+	if (top == -1)
+		return true;
+	if (top >= 0)
+		return false;
+	else {
+		cout << "顺序栈出错" << endl;
+		return false;
+	}
+}
+
+template<class T>
+Stack<T>::~Stack() {
+	delete[] arr;
+}
+
+void Trans(ifstream& ifs, Stack<string>& num, Stack<string>& opor) {
+	char ch;
+	while (ifs >> ch) {
+	FALG:
+		if (ch == '+' || ch == '-') {
+			while (!opor.empty() && opor.Top() != "(") {
+				string temp = opor.Top();
+				num.push(temp);
+				opor.pop();
+			}
+			string s = "";
+			s += ch;
+			opor.push(s);
+		}
+		if (ch == '(') {
+			string s = "";
+			s += ch;
+			opor.push(s);
+		}
+		if (ch == ')') {
+			while (!opor.empty() && opor.Top() != "(") {
+				string temp = opor.Top();
+				num.push(temp);
+				opor.pop();
+			}
+			opor.pop();
+		}
+		if (ch == '*' || ch == '/') {
+			while (!opor.empty() && opor.Top() != "(" && (opor.Top() == "*" || opor.Top() == "/")) {
+				string temp = opor.Top();
+				num.push(temp);
+				opor.pop();
+			}
+			string s = "";
+			s += ch;
+			opor.push(s);
+		}
+		else {
+			string d = "";
+			while (ch <= '9' && ch >= '0') {
+				d += ch;
+				if (!(ifs >> ch)) {
+					d += "#";
+					num.push(d);
+					break;
+				}
+				if (!(ch <= '9' && ch >= '0')) {
+					d += "#";
+					num.push(d);
+					goto FALG;
+				}
+			}
+		}
+	}
+	while (!opor.empty()) {
+		string e = opor.Top();
+		num.push(e);
+		opor.pop();
+	}
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	Stack<string> num;
+	Stack<string> opor;
+	Trans(ifs, num, opor);
+	for (int i = 0; i <= num.top; i++)
+		cout << num.arr[i];
+	return 0;
+}
+
+
+用stack容器来实现
+
+
+#include <iostream>
+#include <stack>
+#include <fstream>
+
+using namespace std;
+
+void Trans(ifstream& ifs, stack<string>& num, stack<string>& opor) {
+	char ch;
+	while (ifs >> ch) {
+	FLAG:
+		if (ch == '+' || ch == '-') {
+			while (!opor.empty() && opor.top() != "(") {
+				string st = opor.top();
+				num.push(st);
+				opor.pop();
+			}
+			string temp = "";
+			temp += ch;
+			opor.push(temp);
+		}
+		if (ch == '*' || ch == '/') {
+			while (!opor.empty() && opor.top() != "(" && (opor.top() == "*" || opor.top() == "/")) {
+				string st = opor.top();
+				num.push(st);
+				opor.pop();
+			}
+			string temp = "";
+			temp += ch;
+			opor.push(temp);
+		}
+		if (ch == '(') {
+			string st;
+			st += ch;
+			opor.push(st);
+		}
+		if (ch == ')') {
+			while (!opor.empty() && opor.top() != "(") {
+				string temp = opor.top();
+				num.push(temp);
+				opor.pop();
+			}
+			opor.pop();
+		}
+		else {
+			string d = "";
+			while (ch <= '9' && ch >= '0') {
+				d += ch;
+				if (!(ifs >> ch)) {
+					d += "#";
+					num.push(d);
+					break;
+				}
+				if (!(ch <= '9' && ch >= '0')) {
+					d += "#";
+					num.push(d);
+					goto FLAG;
+				}
+			}
+		}
+	}
+	while (!opor.empty()) {
+		string temp = opor.top();
+		num.push(temp);
+		opor.pop();
+	}
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	stack<string> num;
+	stack<string> opor;
+	Trans(ifs, num, opor);
+	ifs.close();
+	while (!num.empty()) {
+		string temp = num.top();
+		opor.push(temp);
+		num.pop();
+	}
+	while (!opor.empty()) {
+		cout << opor.top();
+		opor.pop();
+	}
+	return 0;
+}
+

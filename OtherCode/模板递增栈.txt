@@ -1,0 +1,103 @@
+模板递增栈
+
+#include <iostream>
+#include <cstdlib>
+#include <time.h>
+
+using namespace std;
+
+template<class T>
+class CreasingStack {
+public:
+	CreasingStack(int);
+	~CreasingStack();
+	void push(T);
+	void pop();
+	bool gettop(T&);
+	bool empty();
+	void showStack();
+	int top;
+private:
+	int Capacity;
+	T* arr;
+};
+
+template<class T>
+CreasingStack<T>::CreasingStack(int num) {
+	Capacity = num;
+	arr = new T[Capacity];
+	top = -1;
+}
+
+template<class T>
+CreasingStack<T>::~CreasingStack() {
+	delete[] arr;
+}
+
+template<class T>
+void CreasingStack<T>::push(T e) {
+	while (!empty() && arr[top] >= e)
+		pop();
+	top++;
+	arr[top] = e;
+}
+
+template<class T>
+void CreasingStack<T>::pop() {
+	if (!empty())
+		top--;
+	else
+		cout << "递增栈已空！！！" << endl;
+}
+
+template<class T>
+bool CreasingStack<T>::gettop(T& e) {
+	if (!empty()){
+		e = arr[top];
+		return true;
+	}
+	else {
+		cout << "递增栈已空！！！无栈顶元素！！！" << endl;
+		return false;
+	}
+}
+
+template<class T>
+bool CreasingStack<T>::empty() {
+	return top == -1;
+}
+
+template<class T>
+void CreasingStack<T>::showStack() {
+	cout << "top = " << top << endl;
+	for (int i = top; i >= 0; i--) {
+		if (i == 0)
+			cout << arr[i] << endl << "displaying is over!!!" << endl;
+		else
+			cout << arr[i] << " || ";
+	}
+}
+
+int main() {
+	//int类型数据：
+	CreasingStack<int> is(1000);
+	for (int i = 0; i < 100000; i++) {
+		if (is.top == 999)
+			break;
+		int e = 1000+(-2)^i;
+		is.push(e);
+	}
+	is.showStack();
+
+	//float类型数据：
+	CreasingStack<float> fs(1000);
+	for (float i = 0; i < 100; i++) {
+		if (fs.top == 999)
+			break;
+		float e = i/23;
+		fs.push(e);
+	}
+	fs.showStack();
+
+	return 0;
+}

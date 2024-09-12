@@ -1,0 +1,145 @@
+数据结构作业5
+
+
+编程题1
+
+
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+void ChangeString(string& f, string& l) {
+	char sf = f[0];
+	char sl = l[l.length() - 1];
+	int inf = -1;
+	int inl = -1;
+	if (l.find(sf) != string::npos)
+		inf = l.find(sf);
+	if (f.find(sf) != string::npos)
+		inl = f.rfind(sl);
+	if (inl != -1)
+		f.erase(inl + 1);
+	if (inf != -1)
+		l = l.substr(inf);
+}
+
+void GetNext(string t, int* next) {
+	int j = 0, k = -1;
+	next[0] = -1;
+	while (j < t.length()) {
+		if (k == -1 || t[j] == t[k]) {
+			j++;
+			k++;
+			next[j] = k;
+		}
+		else
+			k = next[k];
+	}
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	string f,l;
+	getline(ifs, f);
+	getline(ifs, l);
+	ifs.close();
+	ChangeString(f, l);
+	string s = f + "0" + l + "0";
+	int* next = new int[s.length()];
+	GetNext(s, next);
+	for (int i = 0; i < next[s.length()-1]; i++) {
+		cout << s[i];
+		if (i == next[s.length()-1] - 1)
+			cout << " ";
+	}
+	cout << next[s.length()-1];
+	return 0;
+}
+
+
+编程题2
+
+
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+void change(string& st, int* num) {
+	if (st.length() == 0)
+		return;
+	string temp;
+	int i = 0, j = 0;
+	int num_of_repetition = 1;
+	while (i < st.length() && j < st.length()) {
+		if (i == 0)
+			i++;
+		if (i == st.length()) {
+			temp += st[i - 1];
+			num[j] = num_of_repetition;
+		}
+		else {
+			if (st[i] == ' ') {
+				i++;
+			}
+			if (st[i] == st[i - 2]) {
+				i++;
+				num_of_repetition++;
+				if (i == st.length()) {
+					temp += st[i - 1];
+					num[j] = num_of_repetition;
+				}
+			}
+			else {
+				temp += st[i - 2];
+				num[j] = num_of_repetition;
+				num_of_repetition = 1;
+				i++;
+				j++;
+				if (i == st.length()) {
+					temp += st[i - 1];
+					num[j] = num_of_repetition;
+				}
+			}
+		}
+	}
+	st = temp;
+	return;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	string st;
+	getline(ifs, st);
+	ifs.close();
+	if (st.length() == 0)
+		return 0;
+	int* num = new int[st.length()];
+	change(st, num);
+	for (int i = 0; st[i] != '\0'; i++) {
+		if (st[i + 1] == '\0') {
+			cout << st[i];
+			if (num[i] != 1 && num[i] < 10)
+				cout << " " << num[i];
+			if (num[i] >= 10) {
+				string temp = to_string(num[i]);
+				for (int m = 0; m < temp.length() - 1; m++)
+					cout << temp[m] << " ";
+				cout << temp[temp.length() - 1];
+			}
+			break;
+		}
+		cout << st[i] << " ";
+		if (num[i] != 1 && num[i] < 10)
+			cout << num[i] << " ";
+		if (num[i] >= 10) {
+			string temp = to_string(num[i]);
+			for(int m=0;m<temp.length();m++)
+				cout << temp[m] << " ";
+		}
+	}
+	return 0;
+}

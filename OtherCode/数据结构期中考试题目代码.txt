@@ -1,0 +1,328 @@
+数据结构期中考试题目代码
+
+
+T1
+
+
+#include <iostream>
+#include <list>
+
+using namespace std;
+
+class Node {
+public:
+	string address;
+	int val;
+	string nextaddress;
+	Node(string, int, string);
+};
+
+Node::Node(string a, int v, string n) {
+	address = a;
+	val = v;
+	nextaddress = n;
+}
+
+int main() {
+	list<Node*> front;
+	list<Node*> last;
+	string a0;
+	int	num;
+	cin >> a0 >> num;
+	string* a = new string[num];
+	int* v = new int[num];
+	string* n = new string[num];
+	for (int i = 0; i < num; i++) 
+		cin >> a[i] >> v[i] >> n[i];
+	int x = 1;
+	while (a0 != "-1") {
+		for (int m = 0; m < num; m++) {
+			if (a0 == a[m]) {
+				Node* temp=new Node(a[m], v[m], n[m]);
+				if (x <= num / 2) {
+					front.push_back(temp);
+					x++;
+				}
+				else {
+					last.push_front(temp);
+					x++;
+				}
+				a0 = n[m];
+			}
+		}
+	}
+	while (!last.empty()) {
+		if (!front.empty()) {
+			Node* l = last.front();
+			Node* f = front.front();
+			last.pop_front();
+			front.pop_front();
+			cout << l->address << " " << l->val << " " << f->address << endl;
+			if (!last.empty())
+				cout << f->address << " " << f->val << " " << last.front()->address << endl;
+			else
+				cout << f->address << " " << f->val << " " << "-1" << endl;
+		}
+		else {
+			Node* l = last.front();
+			last.pop_front();
+			cout << l->address << " " << l->val << " " << "-1" << endl;
+			break;
+		}
+	}
+	return 0;
+}
+
+
+
+T2
+
+
+
+#include <iostream>
+#include <queue>
+#include <string>
+
+using namespace std;
+
+class member {
+public:
+	string name;
+	member(string);
+};
+
+member::member(string n) {
+	name = n;
+}
+
+int main() {
+	int num;
+	cin >> num;
+	queue<member>* qu = new queue<member>[num];
+	string* st = new string[num + 1];
+	for (int i = 0; i < num+1; i++) 
+		getline(cin, st[i]);
+	for (int j = 0; j < num; j++) {
+		int m = 0;
+		string temp = "";
+		while (m < st[j+1].length()) {
+			if (st[j+1] == " ") {
+				break;
+			}
+			else {
+				if (st[j+1][m] == ' ') {
+					member mem(temp);
+					qu[j].push(mem);
+					temp = "";
+				}
+				else {
+					temp += st[j+1][m];
+				}
+				m++;
+				if (m == st[j+1].length()) {
+					member mem(temp);
+					qu[j].push(mem);
+					break;
+				}
+			}
+		}
+	}
+	cout << "DEPARTS" << endl;
+	string order;
+	while (cin >> order) {
+		if (order.find("LEAVES") != -1) {
+			int name_team;
+			cin >> name_team;
+			if (name_team <= num && name_team > 0 && !qu[name_team-1].empty()) {
+				member s = qu[name_team-1].front();
+				cout << s.name << endl;
+				qu[name_team-1].pop();
+			}
+		}
+		else {
+			if (order.find("ENTERS") != -1) {
+				string temp;
+				cin >> temp;
+				int name_team;
+				cin >> name_team;
+				if (name_team <= num && name_team > 0) {
+					member m(temp);
+					qu[name_team-1].push(m);
+				}
+			}
+		}
+	}
+	cout << endl;
+	cout << "FINAL CONTENTS" << endl;
+	for (int x = 0; x < num; x++) {
+		cout << "queue " << x+1 << ":";
+		while (!qu[x].empty()) {
+			cout << " " << qu[x].front().name;
+			qu[x].pop();
+		}
+		cout << endl;
+	}
+	return 0;
+}
+
+
+
+
+
+T3
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Stack {
+public:
+	Stack();
+	int push(int v);
+	int pop();
+	~Stack();
+private:
+	int top;
+	int count;
+	int* arr;
+};
+
+Stack::Stack() {
+	top = -1;
+	count = 0;
+	arr = new int[20];
+}
+
+int Stack::push(int v) {
+	if (count == 20)
+		return 999;
+	count++;
+	top++;
+	arr[top] = v;
+	return 0;
+}
+
+int Stack::pop() {
+	if (count == 0)
+		return -999;
+	count--;
+	int temp = arr[top];
+	top--;
+	return temp;
+}
+
+Stack::~Stack() {
+	delete[] arr;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	ofstream ofs("out.txt");
+	int v;
+	Stack st;
+	while (ifs >> v) {
+		if (v == -1) {
+			int temp = st.pop();
+			ofs << temp << endl;
+			if (temp == -999)
+				break;
+		}
+		else {
+			int temp = st.push(v);
+			if (temp == 999)
+				ofs << temp << endl;
+		}
+	}
+	ifs.close();
+	ofs.close();
+	return 0;
+}
+
+
+
+T4
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Stack {
+public:
+	Stack();
+	int push(int v);
+	int pop();
+	bool empty();
+	~Stack();
+private:
+	int top;
+	int count;
+	int* arr;
+};
+
+Stack::Stack() {
+	top = -1;
+	count = 0;
+	arr = new int[200];
+}
+
+int Stack::push(int v) {
+	if (count == 200)
+		return 0;
+	count++;
+	top++;
+	arr[top] = v;
+	return 1;
+}
+
+int Stack::pop() {
+	if (count == 0)
+		return 0;
+	count--;
+	int temp = arr[top];
+	top--;
+	return temp;
+}
+
+bool Stack::empty() {
+	if (count == 0)
+		return true;
+	return false;
+}
+
+Stack::~Stack() {
+	delete[] arr;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	ofstream ofs("out.txt");
+	int v;
+	Stack Odd_number;
+	Stack Even_number;
+	while (ifs >> v) {
+		if (v % 2 == 1)
+			Odd_number.push(v);
+		else
+			Even_number.push(v);
+	}
+	Stack number;
+	while (!Odd_number.empty() || !Even_number.empty()) {
+		while (!Odd_number.empty()) {
+			int temp = Odd_number.pop();
+			number.push(temp);
+		}
+		while (!Even_number.empty()) {
+			int temp = Even_number.pop();
+			number.push(temp);
+		}
+	}
+	while (!number.empty()) {
+		ofs << number.pop() << " ";
+	}
+	ifs.close();
+	ofs.close();
+	return 0;
+}

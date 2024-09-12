@@ -1,0 +1,661 @@
+数据结构实验1
+
+编程题1
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	Node* next;
+	Node();
+	Node(int v);
+};
+
+Node::Node() {
+	next = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void judgeinsert(int);
+	void tailinsert(int);
+	Node* seek(int);
+	void showlist();
+	~list();
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	count = 0;
+}
+
+list::~list() {
+	Node* p = head;
+	while (p != nullptr) {
+		Node* q = p->next;
+		delete p;
+		p = q;
+	}
+}
+
+void list::judgeinsert(int v) {
+	Node* s = new Node(v);
+	if (count == 0) {
+		head->next = s;
+		count++;
+		return;
+	}
+	else {
+		Node* p = seek(v);
+		s->next = p->next;
+		p->next = s;
+		count++;
+		return;
+	}
+}
+
+void list::tailinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head;
+	while (p->next != nullptr) {
+		p = p->next;
+	}
+	p->next = s;
+	count++;
+	return;
+}
+
+Node* list::seek(int v) {
+	Node* p = head;
+	while (p != nullptr) {
+		if (p->next != nullptr && p->next->val >= v && p->val <= v)
+			return p;
+		if (p->next == nullptr)
+			return p;
+		p = p->next;
+	}
+	return head;
+}
+
+void list::showlist() {
+	Node* p = head->next;
+	while (p != nullptr) {
+		cout << p->val << " ";
+		p = p->next;
+	}
+	return;
+}
+
+void rearrange(list& A, list& B, list& C) {
+	Node* a = A.head->next;
+	Node* b = B.head->next;
+	while (a != nullptr && b != nullptr) {
+		while (a->next != nullptr && a->val == a->next->val)
+			a = a->next;
+		while (b->next != nullptr && b->val == b->next->val)
+			b = b->next;
+		if (a == nullptr || b == nullptr)
+			break;
+		else {
+			if (a->val < b->val) {
+				C.tailinsert(a->val);
+				a = a->next;
+			}
+			else {
+				if (b->val < a->val) {
+					C.tailinsert(b->val);
+					b = b->next;
+				}
+				else {
+					if (a->val == b->val) {
+						C.tailinsert(a->val);
+						a = a->next;
+						b = b->next;
+					}
+				}
+			}
+		}
+	}
+	if (a == nullptr && b != nullptr) {
+		while (b != nullptr) {
+			while (b->next != nullptr && b->val == b->next->val)
+				b = b->next;
+			C.tailinsert(b->val);
+			b = b->next;
+		}
+		return;
+	}
+	if (b == nullptr && a != nullptr) {
+		while (a != nullptr) {
+			while (a->next != nullptr && a->val == a->next->val)
+				a = a->next;
+			C.tailinsert(a->val);
+			a = a->next;
+		}
+		return;
+	}
+}
+
+void CreateList(string& st, list& L) {
+	char ch;
+	int i = 0, temp = 0;
+	ch = st[i];
+	while (ch != '\0') {
+		while (ch <= '9' && ch >= '0') {
+			temp = temp * 10 + (ch - '0');
+			i++;
+			ch = st[i];
+		}
+		L.judgeinsert(temp);
+		temp = 0;
+		if (ch == '\0')
+			break;
+		i++;
+		ch = st[i];
+	}
+}
+
+int main() {
+	list A;
+	list B;
+	string st1, st2;
+	getline(cin, st1);
+	getline(cin, st2);
+	CreateList(st1, A);
+	CreateList(st2, B);
+	list C;
+	A.showlist();
+	cout << endl;
+	B.showlist();
+	cout << endl;
+	rearrange(A, B, C);
+	C.showlist();
+	return 0;
+}
+
+
+
+编程题2
+
+
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+template<class T>
+class Stack {
+public:
+	T* arr;
+	int top;
+	Stack();
+	bool push(T);
+	bool pop();
+	bool gettop(T&);
+	T Top();
+	bool empty();
+	~Stack();
+};
+
+template<class T>
+Stack<T>::Stack() {
+	arr = new T[100];
+	top = -1;
+}
+
+template<class T>
+bool Stack<T>::push(T s) {
+	if (top < -1)
+		return false;
+	else {
+		top++;
+		arr[top] = s;
+		return true;
+	}
+}
+
+template<class T>
+bool Stack<T>::pop() {
+	if (top <= -1)
+		return false;
+	else {
+		top--;
+		return true;
+	}
+}
+
+template<class T>
+bool Stack<T>::gettop(T& s) {
+	if (top <= -1)
+		return false;
+	else {
+		s = arr[top];
+		return true;
+	}
+}
+
+template<class T>
+T Stack<T>::Top() {
+	if (top > -1) {
+		return arr[top];
+	}
+	else
+		return arr[0];
+}
+
+template<class T>
+bool Stack<T>::empty() {
+	if (top == -1)
+		return true;
+	if (top >= 0)
+		return false;
+	else {
+		cout << "顺序栈出错" << endl;
+		return false;
+	}
+}
+
+template<class T>
+Stack<T>::~Stack() {
+	delete[] arr;
+}
+
+void Trans(Stack<string>& num, Stack<string>& opor) {
+	char ch;
+	while (cin >> ch) {
+	FALG:
+		if (ch == '+' || ch == '-') {
+			while (!opor.empty() && opor.Top() != "(") {
+				string temp = opor.Top();
+				num.push(temp);
+				opor.pop();
+			}
+			string s = "";
+			s += ch;
+			opor.push(s);
+		}
+		if (ch == '(') {
+			string s = "";
+			s += ch;
+			opor.push(s);
+		}
+		if (ch == ')') {
+			while (!opor.empty() && opor.Top() != "(") {
+				string temp = opor.Top();
+				num.push(temp);
+				opor.pop();
+			}
+			opor.pop();
+		}
+		if (ch == '*' || ch == '/') {
+			while (!opor.empty() && opor.Top() != "(" && (opor.Top() == "*" || opor.Top() == "/")) {
+				string temp = opor.Top();
+				num.push(temp);
+				opor.pop();
+			}
+			string s = "";
+			s += ch;
+			opor.push(s);
+		}
+		else {
+			string d = "";
+			while (ch <= '9' && ch >= '0') {
+				d += ch;
+				if (!(cin >> ch)) {
+					num.push(d);
+					break;
+				}
+				if (ch <= '9' && ch >= '0') {
+					d += ch;
+					if (!(cin >> ch)) {
+						num.push(d);
+						break;
+					}
+					if (!(ch <= '9' && ch >= '0')) {
+						num.push(d);
+						goto FALG;
+					}
+				}
+				if (!(ch <= '9' && ch >= '0')) {
+					num.push(d);
+					goto FALG;
+				}
+			}
+		}
+	}
+	while (!opor.empty()) {
+		string e = opor.Top();
+		num.push(e);
+		opor.pop();
+	}
+	while (!num.empty()) {
+		string str;
+		num.gettop(str);
+		opor.push(str);
+		num.pop();
+	}
+}
+
+void calulate(int& sum, Stack<int>& num1, Stack<string>& opor) {
+	int n1=0, n2=0;
+	string str;
+	while (!opor.empty()) {
+		int temp = 0;
+		opor.gettop(str);
+		opor.pop();
+		if (str == "+") {
+			num1.gettop(n1);
+			num1.pop();
+			num1.gettop(n2);
+			num1.pop();
+			temp = n1 + n2;
+			num1.push(temp);
+		}
+		else {
+			if (str == "-") {
+				num1.gettop(n1);
+				num1.pop();
+				num1.gettop(n2);
+				num1.pop();
+				temp = n2 - n1;
+				num1.push(temp);
+			}
+			else {
+				if (str == "*") {
+					num1.gettop(n1);
+					num1.pop();
+					num1.gettop(n2);
+					num1.pop();
+					temp = n1 * n2;
+					num1.push(temp);
+				}
+				else {
+					if (str == "/") {
+						num1.gettop(n1);
+						num1.pop();
+						num1.gettop(n2);
+						num1.pop();
+						temp = n2 / n1;
+						num1.push(temp);
+					}
+					else {
+						temp = stoi(str);
+						num1.push(temp);
+					}
+				}
+			}
+		}
+	}
+	num1.gettop(sum);
+}
+
+int main() {
+	Stack<string> num;
+	Stack<string> opor;
+	Stack<int> num1;
+	Trans(num, opor);
+	int sum = 0;
+	calulate(sum, num1, opor);
+	cout << endl << sum;
+	return 0;
+}
+
+编程题3
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	Node* next;
+	Node();
+	Node(int v);
+};
+
+Node::Node() {
+	val = 0;
+	next = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void headinsert(int);
+	void tailinsert(int);
+	void assignment(int);
+	void showlist();
+	~list();
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	head->next = head;
+	count = 0;
+}
+
+list::~list() {
+	Node* p = head;
+	if (p->next == nullptr)
+		delete p;
+	else {
+		p = p->next;
+		while (p != head) {
+			Node* q = p->next;
+			delete p;
+			p = q;
+		}
+		delete p;
+	}
+}
+
+void list::headinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head->next;
+	if (count == 0) {
+		count++;
+		head->next = s;
+		s->next = head;
+		return;
+	}
+	else {
+		count++;
+		s->next = p;
+		head->next = s;
+		return;
+	}
+}
+
+void list::tailinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head;
+	while (p->next != head) {
+		p = p->next;
+	}
+	p->next = s;
+	s->next = head;
+	count++;
+	return;
+}
+
+void list::assignment(int n) {
+	Node* p = head;
+	for (int i = 1; i <= n; i++) {
+		for (int j = 0; j <= i; j++) {
+			p = p->next;
+			if (p == head || p->val != 0)
+				j--;
+		}
+		p->val = i;
+	}
+}
+
+void list::showlist() {
+	if (head == nullptr || head->next == nullptr)
+		return;
+	Node* p = head->next;
+	while (p != head) {
+		if (p->next == head) {
+			cout << p->val;
+			return;
+		}
+		cout << p->val << " ";
+		p = p->next;
+	}
+	return;
+}
+
+int main() {
+	int x;
+	cin >> x;
+	int* n = new int[x];
+	list* test = new list[x];
+	for (int i = 0; i < x; i++)
+		cin >> n[i];
+	for (int i = 0; i < x; i++) {
+		for (int j = 0; j < n[i]; j++)
+			test[i].headinsert(0);
+		test[i].assignment(n[i]);
+		test[i].showlist();
+		cout << endl;
+	}
+	delete[] n;
+	return 0;
+}
+
+
+编程题4
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Node {
+public:
+	int n1;
+	int* arr;
+	Node* next;
+	Node();
+	void build(int n, int* num);
+};
+
+Node::Node() {
+	next = nullptr;
+}
+
+void Node::build(int n, int* num) {
+	n1 = n;
+	arr = new int[n];
+	for (int i = 0; i < n; i++)
+		arr[i] = num[i];
+	next = nullptr;
+}
+
+class List {
+public:
+	Node* head;
+	List();
+	bool tailinsert(Node* s);
+	void display();
+};
+
+List::List() {
+	head = new Node();
+}
+
+bool List::tailinsert(Node* s) {
+	Node* p = head;
+	while (p->next != nullptr)
+		p = p->next;
+	p->next = s;
+	return true;
+}
+
+void List::display() {
+	Node* p = head->next;
+	while (p != nullptr) {
+		for (int i = 0; i < p->n1; i++)
+			cout << p->arr[i] << " ";
+		cout << endl;
+		p = p->next;
+	}
+}
+
+void Game(List R, List S, int Rn, int Sn) {
+	ofstream ofs("abc.out");
+	Node* pR = R.head->next;
+	Node* pS = S.head->next;
+	while (pR != nullptr) {
+		while (pS != nullptr) {
+			if (pR->arr[Rn-1] == pS->arr[Sn-1]) {
+				for (int i = 0; i < pR->n1; i++)
+					ofs << pR->arr[i] << " ";
+				for (int i = 0; i < pS->n1; i++)
+					ofs << pS->arr[i] << " ";
+				ofs << endl;
+			}
+			pS = pS->next;
+		}
+		pS = S.head->next;
+		pR = pR->next;
+	}
+	ofs.close();
+	return;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	List R, S;
+	int m, n;
+	ifs >> m >> n;
+	Node* s = new Node[m];
+	int* num = new int[n];
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) 
+		{
+			ifs >> num[j];
+		}
+		s[i].build(n, num);
+		R.tailinsert(&s[i]);
+	}
+	ifs >> m >> n;
+	Node* s1 = new Node[m];
+	int* num1 = new int[n];
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++)
+		{
+			ifs >> num1[j];
+		}
+		s1[i].build(n, num1);
+		S.tailinsert(&s1[i]);
+	}
+	int Rn, Sn;
+	ifs >> Rn >> Sn;
+	ifs.close();
+	Game(R, S, Rn, Sn);
+	return 0;
+}

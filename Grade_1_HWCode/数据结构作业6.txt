@@ -1,0 +1,132 @@
+数据结构作业6
+
+
+编程题1
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Solution {
+public:
+	int totalNQueens(int n);
+	void NQueen(int k);
+private:
+	int N;
+	int* QueenPos;
+	int TotalNum = 0;
+};
+
+int Solution::totalNQueens(int n) {
+	if (n <= 0)
+		return -1;
+	N = n;
+	QueenPos = new int[N];
+	NQueen(0);
+	return TotalNum;
+}
+
+void Solution::NQueen(int k) {
+	int i;
+	if (k == N) {
+		TotalNum++;
+		return;
+	}
+	for (i = 0; i < N; i++) {
+		int j;
+		for (j = 0; j < k; j++) {
+			int temp = (QueenPos[j] - i) >= 0 ? (QueenPos[j] - i) : (i - QueenPos[j]);
+			if (QueenPos[j] == i || (k - j) == temp)
+				break;
+		}
+		if (j == k) {
+			QueenPos[k] = i;
+			NQueen(k + 1);
+		}
+	}
+}
+
+int main() {
+	int n;
+	ifstream ifs("in.txt");
+	ifs >> n;
+	ifs.close();
+	Solution Sol;
+	int num = Sol.totalNQueens(n);
+	if (num != -1)
+		cout << num << endl;
+	return 0;
+}
+
+
+编程题2
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+struct cow {
+	int year;
+	int num;
+	cow(int y);
+	cow(int y, int n);
+};
+
+cow::cow(int y) {
+	year = y;
+	num = 1;
+}
+
+cow::cow(int y, int n) {
+	year = y;
+	num = n;
+}
+
+class CowStory {
+public:
+	int year = 0;
+	CowStory(int n, int primary_year);
+	void Games_cow(int n);
+	int totalnum = 0;
+	int N = 0;
+	vector<cow> vect;
+};
+
+CowStory::CowStory(int n, int primary_year) {
+	N = n;
+	totalnum = 1;
+	cow Primary(primary_year);
+	vect.push_back(Primary);
+}
+
+void CowStory::Games_cow(int n) {
+	if (n >= N)
+		return;
+	int num = 0;
+	for (int i = 0; i < vect.size(); i++) {
+		vect[i].year++;
+		if (vect[i].year >= 4) {
+			num += vect[i].num;
+		}
+	}
+	totalnum += num;
+	cow Newcow(1, num);
+	vect.push_back(Newcow);
+	Games_cow(n + 1);
+}
+
+int main() {
+	int n;
+	ifstream ifs("in.txt");
+	ifs >> n;
+	ifs.close();
+	CowStory CS(n, 4);
+	CS.Games_cow(1);
+	cout << CS.totalnum;
+	return 0;
+}

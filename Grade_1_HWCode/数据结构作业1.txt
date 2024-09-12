@@ -1,0 +1,507 @@
+数据结构作业
+
+编程题1
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	Node* next;
+	Node();
+	Node(int v);
+};
+
+Node::Node() {
+	next = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void copylist(list);
+	void headinsert(int);
+	void tailinsert(int);
+	void betweeninsert(int, int);
+	void Delete(int);
+	void Delete_next(Node*);
+	Node* getval(int);
+	void rearrange(int);
+	void showlist();
+	void createlist(int);
+	//~list();
+private:
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	head->next = head;
+	count = 0;
+}
+
+void list::copylist(list t) {
+	Node* s = t.head->next;
+	while (s != t.head) {
+		int v = s->val;
+		tailinsert(v);
+		s = s->next;
+	}
+}
+
+/*list::~list() {
+	Node* p = head;
+	if (p->next == head)
+		delete p;
+	else {
+		p = p->next;
+		while (p != head) {
+			Node* q = p->next;
+			delete p;
+			p = q;
+		}
+		delete p;
+	}
+	//cout << "链表已经被析构" << endl;
+}*/
+
+void list::headinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head->next;
+	if (count == 0) {
+		count++;
+		head->next = s;
+		s->next = head;
+		return;
+	}
+	else {
+		count++;
+		s->next = p;
+		head->next = s;
+		return;
+	}
+}
+
+void list::tailinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head;
+	while (p->next != head) {
+		p = p->next;
+	}
+	p->next = s;
+	s->next = head;
+	count++;
+	return;
+}
+
+void list::betweeninsert(int i, int v) {
+	Node* s = new Node(v);
+	if (i<0 ) {
+		cout << "插入的位置不在链表长度以内，插入失败" << endl;
+		return;
+	}
+	else {
+		if (i == 0) {
+			headinsert(v);
+			return;
+		}
+		else {
+			if (i == count) {
+				tailinsert(v);
+				return;
+			}
+			else {
+				count++;
+				Node* p = head;
+				for (int j = 0; j < i; j++) {
+					p = p->next;
+					if (p == head)
+						j--;
+				}
+				s->next = p->next;
+				p->next = s;
+				return;
+			}
+		}
+	}
+}
+
+void list::Delete(int i) {
+	Node* p = head;
+	if (i < 0 ) {
+		cout << "链表上不存在要删除的元素" << endl;
+		return;
+	}
+	else {
+		count--;
+			for (int j = 0; j < i; j++) {
+				p = p->next;
+				if (p == head)
+					j--;
+			}
+		Node* q = p->next;
+		p->next = q->next;
+		delete q;
+		return;
+	}
+}
+
+void list::Delete_next(Node* q) {
+	if (count == 1) {
+		delete q->next;
+		head->next = head;
+		count = 0;
+	}
+	else {
+		Node* p = q->next;
+		q->next = p->next;
+		delete p;
+		count--;
+	}
+}
+
+Node* list::getval(int i) {
+	if (i < 0 ) {
+		cout << "链表上不存在该元素" << endl;
+		return nullptr;
+	}
+	else {
+		Node* p = head->next;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+			if (p == head)
+				j--;
+		}
+		cout << p->val << endl;
+		return p;
+	}
+}
+00
+
+void list::rearrange(int N) {
+	list templist;
+	Node* s = head;
+	Node* q = nullptr;
+	int i = 1;
+	if (N == 1)
+		return;
+	if (N >= 2) {
+		while (count != 0) {
+			for (i; i <= N; i++) {
+				q = s;
+				s = s->next;
+				if (s == head)
+					i--;
+			}
+			int v = s->val;
+			templist.tailinsert(v);
+			s = s->next;
+			if (s == head)
+				s = s->next;
+			i = 2;
+			Delete_next(q);
+		}
+		copylist(templist);
+	}
+}
+
+void list::showlist() {
+	Node* p = head->next;
+	//cout << "head-->";
+	int i = 0;
+	while (p != head) {
+		if (i == 0) {
+			cout << p->val;
+			i = 1;
+		}
+		else {
+			if(p->val <10)
+				cout << "   " << p->val;
+			if(p->val >=10)
+				cout << "  " << p->val;
+		}
+		p = p->next;
+	}
+	//cout << "head";
+	cout << endl;
+	return;
+}
+
+void list::createlist(int M) {
+	for (int i = 1; i <= M; i++)
+		tailinsert(i);
+}
+
+int main() {
+	list a;
+	int M,N;
+	cin >> M;
+	a.createlist(M);
+	while (cin >> N) {
+		a.rearrange(N);
+	}
+	a.showlist();
+	return 0;
+}
+
+
+编程题2
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+void rearrange(int* s,int num) {
+	for (int i = 0; i < num - 1; i++) {
+		for (int x = 0; x < num - i - 1; x++) {
+			if (s[x] > s[x + 1]) {
+				int temp = s[x];
+				s[x] = s[x + 1];
+				s[x + 1] = temp;
+			}
+		}
+	}
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int numA, numB;
+	ifs >> numA >> numB;
+	int* A = new int[numA];
+	int* B = new int[numB];
+	int i=0;
+	int v;
+	for (i; i < numA; i++) {
+		ifs >> v;
+		A[i] = v;
+	}
+	i = 0;
+	for (i; i < numB; i++) {
+		ifs >> v;
+		B[i] = v;
+	}
+	int* C = new int[numA + numB];
+	for (int j = 0; j < numA + numB; j++) {
+		if (j >= 0 && j < numA) {
+			C[j] = A[j];
+		}
+		else {
+			C[j] = B[j - numA];
+		}
+	}
+	rearrange(C, numA + numB);
+	for (int x = 0; x < numA + numB; x++) {
+		if (x > 0) {
+			if (C[x] != C[x - 1])
+				cout << C[x] << " ";
+		}
+		else {
+			cout << C[x] << " ";
+		}
+	}
+	return 0;
+}
+
+编程题3
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	Node* next;
+	Node();
+	Node(int v);
+};
+
+Node::Node() {
+	next = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void headinsert(int);
+	void tailinsert(int);
+	void betweeninsert(int, int);
+	void Delete(int);
+	Node* getval(int);
+	void showlist();
+	void reorderList();
+	void copylist(list);
+private:
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	count = 0;
+}
+
+void list::headinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head->next;
+	if (count == 0) {
+		count++;
+		head->next = s;
+		return;
+	}
+	else {
+		count++;
+		s->next = p;
+		head->next = s;
+		return;
+	}
+}
+
+void list::tailinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head;
+	while (p->next != nullptr) {
+		p = p->next;
+	}
+	p->next = s;
+	count++;
+	return;
+}
+
+void list::betweeninsert(int i, int v) {
+	Node* s = new Node(v);
+	if (i<0 || i>count) {
+		cout << "插入的位置不在链表长度以内，插入失败" << endl;
+		return;
+	}
+	else {
+		if (i == 0) {
+			headinsert(v);
+			return;
+		}
+		else {
+			if (i == count) {
+				tailinsert(v);
+				return;
+			}
+			else {
+				count++;
+				Node* p = head;
+				for (int j = 0; j < i; j++) {
+					p = p->next;
+				}
+				s->next = p->next;
+				p->next = s;
+				return;
+			}
+		}
+	}
+}
+
+void list::Delete(int i) {
+	Node* p = head;
+	if (i < 0 || i >= count) {
+		cout << "链表上不存在要删除的元素" << endl;
+		return;
+	}
+	else {
+		count--;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+		}
+		Node* q = p->next;
+		p->next = q->next;
+		delete q;
+		return;
+	}
+}
+
+Node* list::getval(int i) {
+	if (i < 0 || i >= count) {
+		//cout << "链表上不存在该元素" << endl;
+		return nullptr;
+	}
+	else {
+		Node* p = head->next;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+		}
+		//cout << p->val << endl;
+		return p;
+	}
+}
+
+void list::showlist() {
+	Node* p = head->next;
+	while (p != nullptr) {
+		if (p->next == nullptr)
+			cout << p->val;
+		else {
+			cout << p->val << " ";
+		}
+		p = p->next;
+	}
+	//cout << "nullptr";
+	return;
+}
+
+void list::copylist(list t) {
+	Node* s = head->next;
+	head->next = t.head->next;
+	t.head->next = s;
+}
+
+void list::reorderList() {
+	list templist;
+	int a = count % 2;
+	if (a == 0) {
+		for (int i = 0; i < count / 2; i++) {
+			Node* prior = getval(i);
+			Node* next = getval(count - i - 1);
+			templist.tailinsert(prior->val);
+			templist.tailinsert(next->val);
+		}
+	}
+	if (a == 1) {
+		for (int i = 0; i < (count-1) / 2; i++) {
+			Node* prior = getval(i);
+			Node* next = getval(count - i - 1);
+			templist.tailinsert(prior->val);
+			templist.tailinsert(next->val);
+		}
+		Node* q = getval((count - 1)/2);
+		int v = q->val;
+		templist.tailinsert(v);
+	}
+	copylist(templist);
+}
+
+int main() {
+	list a;
+	fstream ifs("in.txt");
+	int v;
+	while (ifs >> v) {
+		a.tailinsert(v);
+	}
+	a.reorderList();
+	a.showlist();
+	return 0;
+}
+
