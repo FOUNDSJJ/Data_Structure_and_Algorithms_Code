@@ -1,0 +1,102 @@
+大二_数据结构A_作业1
+
+
+
+T1  最大素数因子
+
+
+#include <iostream>
+#include <fstream>
+#include <math.h>
+#include <vector>
+
+using namespace std;
+
+bool is_Prime(int num) {
+	for (int i = 2; i <= sqrt((double)num); i++)
+		if (num % i == 0)
+			return false;
+	return true;
+}
+
+int Max_PrimeFactor(int num) {
+	int max = 1;
+	vector<int> Factor;
+	for (int i = 2; i <= sqrt((double)num); i++) {
+		if (num % i == 0) {
+			Factor.push_back(i);
+			Factor.push_back(num / i);
+		}
+	}
+	if (Factor.size() == 0)
+		return num;
+	for (vector<int>::iterator it = Factor.begin(); it < Factor.end(); it++)
+		if (*it > max && is_Prime(*it))
+			max = *it;
+	return max;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int num = 0;
+	ifs >> num;
+	if (num < 1)
+		return 0;
+	int MaxPrimeFactor = 1, Prime, result;
+	ifs >> Prime;
+	result = Prime;
+	MaxPrimeFactor = Max_PrimeFactor(Prime);
+	while (ifs >> Prime) {
+		if (MaxPrimeFactor < Max_PrimeFactor(Prime)) {
+			MaxPrimeFactor = Max_PrimeFactor(Prime);
+			result = Prime;
+		}
+	}
+	cout << result;
+	return 0;
+}
+
+
+
+
+
+
+T2 判断回文数
+
+
+
+
+
+
+#include <iostream>
+#include <string>
+#include <fstream>
+
+using namespace std;
+
+int is_Palindrom(int num) {
+	if (num < 0)
+		return 0;
+	if (num == 0)
+		return 1;
+	string str = "";
+	while (num>=1) {
+		int bit = num % 10;
+		num /= 10;
+		str += char(bit + 48);
+	}
+	for (int i = 0; i < str.length() / 2; i++) 
+		if (str[i] != str[str.length() - 1 - i])
+			return 0;
+	return 1;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int num;
+	ifs >> num;
+	int result = is_Palindrom(num);
+	cout << result;
+	return 0;
+}
+
