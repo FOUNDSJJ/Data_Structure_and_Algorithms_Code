@@ -1,0 +1,625 @@
+大二_数据结构A_作业2
+
+
+
+
+T1 两数之和
+
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+int total_of_num = 0;
+
+class solution {
+public:
+	vector<int> twoSum(vector<int>& nums, int target) {
+		int x = 0;
+		for (int i = 0; i < total_of_num - 1; i++) {
+			for (int j = i + 1; j < total_of_num; j++) {
+				if ((nums[i] + nums[j]) == target) {
+					cout << i << " " << j << endl;
+					x = 1;
+					break;
+				}
+			}
+		}
+		if (x == 0) {
+			cout << "-1" << " " << "-1" << endl;
+		}
+		return nums;
+	}
+};
+
+
+int main() {
+	ifstream ifs("in.txt");
+	int x;
+	vector<int> nums;
+	while (ifs >> x) {
+		nums.push_back(x);
+		total_of_num++;
+	}
+	solution a;
+	total_of_num--;
+	a.twoSum(nums, nums[total_of_num]);
+	ifs.close();
+	return 0;
+}
+
+
+
+
+
+T2 链表重排
+
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	Node* next;
+	Node();
+	Node(int v);
+};
+
+Node::Node() {
+	next = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void headinsert(int);
+	void tailinsert(int);
+	void betweeninsert(int, int);
+	void Delete(int);
+	Node* getval(int);
+	void showlist();
+	void reorderList();
+	void copylist(list);
+private:
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	count = 0;
+}
+
+void list::headinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head->next;
+	if (count == 0) {
+		count++;
+		head->next = s;
+		return;
+	}
+	else {
+		count++;
+		s->next = p;
+		head->next = s;
+		return;
+	}
+}
+
+void list::tailinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head;
+	while (p->next != nullptr) {
+		p = p->next;
+	}
+	p->next = s;
+	count++;
+	return;
+}
+
+void list::betweeninsert(int i, int v) {
+	Node* s = new Node(v);
+	if (i<0 || i>count) {
+		cout << "插入的位置不在链表长度以内，插入失败" << endl;
+		return;
+	}
+	else {
+		if (i == 0) {
+			headinsert(v);
+			return;
+		}
+		else {
+			if (i == count) {
+				tailinsert(v);
+				return;
+			}
+			else {
+				count++;
+				Node* p = head;
+				for (int j = 0; j < i; j++) {
+					p = p->next;
+				}
+				s->next = p->next;
+				p->next = s;
+				return;
+			}
+		}
+	}
+}
+
+void list::Delete(int i) {
+	Node* p = head;
+	if (i < 0 || i >= count) {
+		cout << "链表上不存在要删除的元素" << endl;
+		return;
+	}
+	else {
+		count--;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+		}
+		Node* q = p->next;
+		p->next = q->next;
+		delete q;
+		return;
+	}
+}
+
+Node* list::getval(int i) {
+	if (i < 0 || i >= count) {
+		//cout << "链表上不存在该元素" << endl;
+		return nullptr;
+	}
+	else {
+		Node* p = head->next;
+		for (int j = 0; j < i; j++) {
+			p = p->next;
+		}
+		//cout << p->val << endl;
+		return p;
+	}
+}
+
+void list::showlist() {
+	Node* p = head->next;
+	while (p != nullptr) {
+		if (p->next == nullptr)
+			cout << p->val;
+		else {
+			cout << p->val << " ";
+		}
+		p = p->next;
+	}
+	//cout << "nullptr";
+	return;
+}
+
+void list::copylist(list t) {
+	Node* s = head->next;
+	head->next = t.head->next;
+	t.head->next = s;
+}
+
+void list::reorderList() {
+	list templist;
+	int a = count % 2;
+	if (a == 0) {
+		for (int i = 0; i < count / 2; i++) {
+			Node* prior = getval(i);
+			Node* next = getval(count - i - 1);
+			templist.tailinsert(prior->val);
+			templist.tailinsert(next->val);
+		}
+	}
+	if (a == 1) {
+		for (int i = 0; i < (count-1) / 2; i++) {
+			Node* prior = getval(i);
+			Node* next = getval(count - i - 1);
+			templist.tailinsert(prior->val);
+			templist.tailinsert(next->val);
+		}
+		Node* q = getval((count - 1)/2);
+		int v = q->val;
+		templist.tailinsert(v);
+	}
+	copylist(templist);
+}
+
+int main() {
+	list a;
+	fstream ifs("in.txt");
+	int v;
+	while (ifs >> v) {
+		a.tailinsert(v);
+	}
+	a.reorderList();
+	a.showlist();
+	return 0;
+}
+
+
+
+
+
+T3 顺序表元素划分
+
+
+
+#include <iostream>
+
+using namespace std;
+
+void exchangeValue(int*& arr, int i, int j) {
+	if (i < 0 || j < 0)
+		return;
+	int temp = arr[i];
+	arr[i] = arr[j];
+	arr[j] = temp;
+	return;
+}
+
+void quickSort(int*& arr, int num, int referenceValue) {
+	if (num <= 0 || arr == nullptr)
+		return;
+	int i = 0, j = num - 1;
+	while (i < j && i < num && j >= 0) {
+		while (arr[i] <= referenceValue && i < j)
+			i++;
+		while (arr[j] >= referenceValue && j > i)
+			j--;
+		exchangeValue(arr, i, j);
+		i++;
+		j--;
+	}
+}
+
+int main() {
+	int K1, K2, num;
+	cin >> K1 >> K2 >> num;
+	int* arr = new int[num];
+	int i = 0;
+	while (cin >> arr[i] && i < num)
+		i++;
+	quickSort(arr, num, K1);
+	quickSort(arr, num, K2);
+	for (int i = 0; i < num; i++)
+		cout << arr[i] << " ";
+	return 0;
+}
+
+
+
+
+T4 集合并集运算
+
+
+
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+void Arrange(int*& Set, int num) {
+	for (int i = 1; i < num; i++) {
+		for (int j = 0; j < num - i; j++) {
+			if (Set[j + 1] < Set[j]) {
+				int temp = Set[j + 1];
+				Set[j + 1] = Set[j];
+				Set[j] = temp;
+			}
+		}
+	}
+}
+
+void Arrange_TwoSet(int*& A, int*& B, int num_A, int num_B, int*& result) {
+	Arrange(A, num_A);
+	Arrange(B, num_B);
+	int m = 0, n = 0;
+	int i = 1;
+	for (; m < num_A && n < num_B;) {
+		if (A[m] < B[n]) {
+			result[i] = A[m];
+			m++;
+		}
+		else {
+			if (B[n] < A[m]) {
+				result[i] = B[n];
+				n++;
+			}
+			else {
+				result[i] = A[m];
+				m++;
+				n++;
+			}
+		}
+		i++;
+	}
+	while (m < num_A) {
+		result[i] = A[m];
+		i++;
+		m++;
+	}
+	while (n < num_B) {
+		result[i] = B[n];
+		i++;
+		n++;
+	}
+	result[0] = i - 1;
+}
+
+int main() {
+	ifstream ifs("in.txt");
+	int num_A, num_B;
+	ifs >> num_A >> num_B;
+	if (num_A < 0 && num_B < 0)
+		return 0;
+	int* A = new int[num_A];
+	int* B = new int[num_B];
+	int temp;
+	for (int i = 0; i < num_A + num_B; i++) {
+		ifs >> temp;
+		if (i < num_A)
+			A[i] = temp;
+		else
+			B[i - num_A] = temp;
+	}
+	ifs.close();
+	int* result = new int[num_A + num_B + 1];
+	Arrange_TwoSet(A, B, num_A, num_B, result);
+	for (int i = 1; i <= result[0]; i++)
+		cout << result[i] << " ";
+	return 0;
+}
+
+
+
+
+
+T6 归并排序
+
+
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+using namespace std;
+
+void Merge(vector<int>& vec, int Start, int Mid, int End) {
+	int i = Start, j = Mid + 1, t = 0;
+	int* Temp = new int[End - Start + 1];
+	while (i <= Mid && j <= End) {
+		if (vec[i] <= vec[j]) {
+			Temp[t] = vec[i];
+			i++;
+			t++;
+		}
+		else {
+			Temp[t] = vec[j];
+			j++;
+			t++;
+		}
+	}
+	while (i <= Mid) {
+		Temp[t] = vec[i];
+		i++;
+		t++;
+	}
+	while (j <= End) {
+		Temp[t] = vec[j];
+		j++;
+		t++;
+	}
+	for (int m = 0; m < t; m++)
+		vec[Start + m] = Temp[m];
+	delete[] Temp;
+	return;
+}
+
+void MergePass(vector<int>& vec, int Len, int num) {
+	int i = 0;
+	for (; i + 2 * Len - 1 < num; i += 2 * Len)
+		Merge(vec, i, i + Len - 1, i + 2 * Len - 1);
+	if (i + Len < num)
+		Merge(vec, i, i + Len - 1, num - 1);
+	return;
+}
+
+void Display(vector<int> vec, int num) {
+	ofstream ofs("out.txt");
+	for (int i = 0; i < num; i++)
+		ofs << vec[i] << " ";
+	ofs.close();
+	return;
+}
+
+int main() {
+	fstream ifs("in.txt");
+	int num = 0, temp = 0;
+	vector<int> vec;
+	while (ifs >> temp) {
+		vec.push_back(temp);
+		num++;
+	}
+	ifs.close();
+	for (int Len = 1; Len < num; Len *= 2)
+		MergePass(vec, Len, num);
+	Display(vec, num);
+	return 0;
+}
+
+
+
+
+
+
+T6 好玩的约瑟夫环-单链表版本
+
+
+
+#include <iostream>
+
+using namespace std;
+
+class Node {
+public:
+	int val;
+	Node* next = nullptr;
+	Node();
+	Node(int v);
+};
+
+Node::Node() {
+	next = nullptr;
+}
+
+Node::Node(int v) {
+	val = v;
+	next = nullptr;
+}
+
+class list {
+public:
+	list();
+	void copylist(list&);
+	void tailinsert(int);
+	void Delete_next(Node*);
+	void rearrange(int);
+	void showlist();
+	void createlist(int);
+	~list();
+private:
+	Node* head;
+	int count;
+};
+
+list::list() {
+	head = new Node();
+	head->next = head;
+	count = 0;
+}
+
+void list::copylist(list& t) {
+	Node* s = t.head->next;
+	while (s != t.head) {
+		int v = s->val;
+		tailinsert(v);
+		s = s->next;
+	}
+}
+
+list::~list() {
+	Node* p = head->next;
+	while (p != head && p != nullptr) {
+		Node* q = p;
+		p = p->next;
+		delete q;
+	}
+	delete head;
+}
+
+void list::tailinsert(int v) {
+	Node* s = new Node(v);
+	Node* p = head;
+	while (p->next != head) {
+		p = p->next;
+	}
+	p->next = s;
+	s->next = head;
+	count++;
+	return;
+}
+
+void list::Delete_next(Node* q) {
+	if (count == 1) {
+		if (q->next == head)
+			q = q->next;
+		delete q->next;
+		head->next = head;
+		count = 0;
+	}
+	else {
+		Node* p = q->next;
+		if (p == head)
+			p = p->next;
+		q->next = p->next;
+		delete p;
+		count--;
+	}
+}
+
+void list::rearrange(int N) {
+	list templist;
+	Node* s = head;
+	Node* q = nullptr;
+	int i = 1;
+	if (N == 1)
+		return;
+	if (N >= 2) {
+		while (count != 0) {
+			for (; i <= N; i++) {
+				q = s;
+				s = s->next;
+				if (s == head)
+					i--;
+			}
+			int v = s->val;
+			templist.tailinsert(v);
+			s = s->next;
+			if (s == head)
+				s = s->next;
+			i = 2;
+			Delete_next(q);
+		}
+		copylist(templist);
+	}
+}
+
+void list::showlist() {
+	Node* p = head->next;
+	int i = 0;
+	while (p != head) {
+		if (i == 0) {
+			cout << p->val;
+			i = 1;
+		}
+		else {
+			if (p->val < 10)
+				cout << "   " << p->val;
+			if (p->val >= 10)
+				cout << "  " << p->val;
+		}
+		p = p->next;
+	}
+	cout << endl;
+	return;
+}
+
+void list::createlist(int M) {
+	for (int i = 1; i <= M; i++)
+		tailinsert(i);
+}
+
+int main() {
+	list a;
+	int M, N;
+	cin >> M;
+	a.createlist(M);
+	while (cin >> N) {
+		a.rearrange(N);
+	}
+	a.showlist();
+	return 0;
+}
