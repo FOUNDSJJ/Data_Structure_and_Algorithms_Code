@@ -27,6 +27,7 @@ int main() {
 	string MainString, SmallString;
 	getline(ifs, MainString, ' ');
 	getline(ifs, SmallString, ' ');
+	ifs.close();
 	cout << GetNum(MainString, SmallString);
 	return 0;
 }
